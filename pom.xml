@@ -13,7 +13,7 @@
     <groupId>com.kidbank</groupId>
     <artifactId>kidbank</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <n>kidbank</n>
+    <name>kidbank</name>
     <description>Kids Finance App - Backend API</description>
 
     <properties>
