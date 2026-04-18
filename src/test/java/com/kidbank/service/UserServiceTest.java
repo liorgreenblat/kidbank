@@ -38,7 +38,6 @@ class UserServiceTest {
     void createUser_success() {
         when(userRepository.findByUsername("yuval")).thenReturn(Optional.empty());
         when(userRepository.save(any())).thenReturn(mockUser);
-        when(depositRepository.findByUserId(1L)).thenReturn(Optional.empty());
 
         UserResponse res = userService.createUser(new UserRequest("יובל", "yuval"));
 

@@ -42,7 +42,6 @@ class DepositServiceTest {
     @Test
     void getDeposit_returnsProjections() {
         when(depositRepository.findByUserId(1L)).thenReturn(Optional.of(mockDeposit));
-        when(depositRepository.save(any())).thenReturn(mockDeposit);
 
         DepositResponse res = depositService.getDeposit(1L);
 
