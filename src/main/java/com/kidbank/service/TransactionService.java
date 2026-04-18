@@ -42,6 +42,7 @@ public class TransactionService {
                 .type(req.getType())
                 .amount(req.getAmount())
                 .description(req.getDescription())
+                .category(req.getCategory())
                 .build();
 
         tx = transactionRepository.save(tx);
@@ -89,6 +90,7 @@ public class TransactionService {
                 .type(tx.getType())
                 .amount(tx.getAmount())
                 .description(tx.getDescription())
+                .category(tx.getCategory())
                 .createdAt(tx.getCreatedAt())
                 .build();
     }

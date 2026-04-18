@@ -59,17 +59,23 @@ public class Dtos {
         @NotNull public Transaction.Type type;
         @NotNull @Positive public BigDecimal amount;
         public String description;
+        public Transaction.Category category;
 
         public TransactionRequest() {}
         public TransactionRequest(Transaction.Type type, BigDecimal amount, String description) {
             this.type = type; this.amount = amount; this.description = description;
         }
+        public TransactionRequest(Transaction.Type type, BigDecimal amount, String description, Transaction.Category category) {
+            this.type = type; this.amount = amount; this.description = description; this.category = category;
+        }
         public Transaction.Type getType() { return type; }
         public BigDecimal getAmount() { return amount; }
         public String getDescription() { return description; }
+        public Transaction.Category getCategory() { return category; }
         public void setType(Transaction.Type t) { this.type = t; }
         public void setAmount(BigDecimal a) { this.amount = a; }
         public void setDescription(String d) { this.description = d; }
+        public void setCategory(Transaction.Category c) { this.category = c; }
     }
 
     public static class TransactionResponse {
@@ -77,27 +83,30 @@ public class Dtos {
         public Transaction.Type type;
         public BigDecimal amount;
         public String description;
+        public Transaction.Category category;
         public LocalDateTime createdAt;
 
         public TransactionResponse() {}
-        public TransactionResponse(Long id, Transaction.Type type, BigDecimal amount, String description, LocalDateTime createdAt) {
-            this.id = id; this.type = type; this.amount = amount; this.description = description; this.createdAt = createdAt;
+        public TransactionResponse(Long id, Transaction.Type type, BigDecimal amount, String description, Transaction.Category category, LocalDateTime createdAt) {
+            this.id = id; this.type = type; this.amount = amount; this.description = description; this.category = category; this.createdAt = createdAt;
         }
         public static Builder builder() { return new Builder(); }
         public static class Builder {
             private Long id; private Transaction.Type type; private BigDecimal amount;
-            private String description; private LocalDateTime createdAt;
+            private String description; private Transaction.Category category; private LocalDateTime createdAt;
             public Builder id(Long id) { this.id = id; return this; }
             public Builder type(Transaction.Type t) { this.type = t; return this; }
             public Builder amount(BigDecimal a) { this.amount = a; return this; }
             public Builder description(String d) { this.description = d; return this; }
+            public Builder category(Transaction.Category c) { this.category = c; return this; }
             public Builder createdAt(LocalDateTime t) { this.createdAt = t; return this; }
-            public TransactionResponse build() { return new TransactionResponse(id, type, amount, description, createdAt); }
+            public TransactionResponse build() { return new TransactionResponse(id, type, amount, description, category, createdAt); }
         }
         public Long getId() { return id; }
         public Transaction.Type getType() { return type; }
         public BigDecimal getAmount() { return amount; }
         public String getDescription() { return description; }
+        public Transaction.Category getCategory() { return category; }
         public LocalDateTime getCreatedAt() { return createdAt; }
     }
 

@@ -51,6 +51,19 @@ class TransactionServiceTest {
     }
 
     @Test
+    void addTransaction_withCategory_persistsCategory() {
+        Transaction saved = Transaction.builder().id(3L).user(mockUser).type(Type.INCOME)
+                .amount(new BigDecimal("50.00")).description("מתנת יום הולדת")
+                .category(Transaction.Category.BIRTHDAY).createdAt(LocalDateTime.now()).build();
+        when(transactionRepository.save(any())).thenReturn(saved);
+
+        TransactionResponse res = transactionService.addTransaction(1L,
+                new TransactionRequest(Type.INCOME, new BigDecimal("50.00"), "מתנת יום הולדת", Transaction.Category.BIRTHDAY));
+
+        assertThat(res.getCategory()).isEqualTo(Transaction.Category.BIRTHDAY);
+    }
+
+    @Test
     void addExpense_decreasesCheckingBalance() {
         Transaction saved = Transaction.builder().id(2L).user(mockUser).type(Type.EXPENSE)
                 .amount(new BigDecimal("30.00")).description("פיצה").createdAt(LocalDateTime.now()).build();
