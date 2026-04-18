@@ -54,6 +54,7 @@ public class DepositService {
                 .type(Transaction.Type.DEPOSIT_IN)
                 .amount(req.getAmount())
                 .description("הפקדה לפיקדון")
+                .category(Transaction.Category.SAVINGS)
                 .build());
 
         return toResponse(deposit);
@@ -78,6 +79,7 @@ public class DepositService {
                 .type(Transaction.Type.DEPOSIT_OUT)
                 .amount(req.getAmount())
                 .description("משיכה מפיקדון")
+                .category(Transaction.Category.SAVINGS)
                 .build());
 
         return toResponse(deposit);

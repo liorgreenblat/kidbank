@@ -2,6 +2,7 @@ package com.kidbank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kidbank.dto.Dtos.*;
+import com.kidbank.model.Transaction;
 import com.kidbank.model.Transaction.Type;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,16 @@ class TransactionControllerIntegrationTest {
 
         mockMvc.perform(get("/api/users/" + userId))
                 .andExpect(jsonPath("$.checkingBalance").value(100.00));
+    }
+
+    @Test
+    void addTransaction_withCategory_returnsCategory() throws Exception {
+        mockMvc.perform(post("/api/users/" + userId + "/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new TransactionRequest(Type.INCOME, new BigDecimal("50.00"), "מתנת יום הולדת", Transaction.Category.BIRTHDAY))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.category").value("BIRTHDAY"));
     }
 
     @Test

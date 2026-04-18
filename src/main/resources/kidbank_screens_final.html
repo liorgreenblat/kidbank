@@ -1,0 +1,231 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.scene { display: flex; gap: 28px; justify-content: center; align-items: flex-start; padding: 2rem 1rem; flex-wrap: wrap; }
+.phone { width: 210px; background: #1a1a2e; border-radius: 32px; padding: 12px; box-shadow: 0 0 0 2px #2a2a3e; flex-shrink: 0; }
+.screen { border-radius: 22px; overflow: hidden; height: 460px; position: relative; direction: rtl; display: flex; flex-direction: column; background: #f5f0ff; }
+.status { height: 20px; min-height: 20px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 9px; direction: ltr; flex-shrink: 0; }
+.scroll-body { flex: 1; overflow-y: auto; padding-bottom: 44px; }
+.scroll-body::-webkit-scrollbar { width: 0; }
+.nav { display: flex; justify-content: space-around; padding: 8px 6px; border-top: 0.5px solid #e5e7eb; position: absolute; bottom: 0; left: 0; right: 0; background: white; border-radius: 0 0 22px 22px; height: 44px; z-index: 10; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 7px; color: #aaa; }
+.nav-icon { font-size: 14px; }
+.label { text-align: center; font-size: 11px; color: var(--color-text-secondary); margin-top: 10px; font-weight: 500; }
+
+/* SCREEN 1 – Dashboard */
+.s1-header { background: #7c3aed; padding: 12px 14px 14px; color: white; flex-shrink: 0; }
+.s1-greet { font-size: 10px; opacity: 0.8; }
+.s1-name { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.bal-box { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 10px; }
+.bal-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+.bal-row + .bal-row { border-top: 0.5px solid rgba(255,255,255,0.2); }
+.bal-lbl { font-size: 9px; opacity: 0.85; }
+.bal-val { font-size: 11px; font-weight: 600; }
+.bal-total-val { font-size: 12px; font-weight: 700; }
+
+.mini-cards { display: flex; gap: 6px; padding: 8px 10px 0; flex-shrink: 0; }
+.mini-card { flex: 1; background: white; border-radius: 10px; padding: 7px 5px; text-align: center; }
+.mini-card.range-card { border: 1.5px solid #a855f7; }
+.mi { font-size: 12px; margin-bottom: 1px; }
+.ml { font-size: 7px; color: #666; }
+.mv { font-size: 10px; font-weight: 600; color: #7c3aed; }
+.mv.range { font-size: 9px; color: #a855f7; }
+
+.sec-title { font-size: 9px; font-weight: 600; color: #555; padding: 8px 10px 4px; }
+.tx-list { padding: 0 10px; }
+.tx-row { display: flex; align-items: center; gap: 7px; padding: 6px 0; border-bottom: 0.5px solid #f0e8ff; }
+.tx-row:last-child { border-bottom: none; }
+.tx-ico { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.tx-info { flex: 1; }
+.tx-name { font-size: 9px; font-weight: 500; color: #333; }
+.tx-date { font-size: 7px; color: #aaa; margin-top: 1px; }
+.tx-amt { font-size: 10px; font-weight: 600; white-space: nowrap; }
+.plus { color: #059669; }
+.minus { color: #dc2626; }
+
+/* SCREEN 2 – Deposits */
+.s2-header { background: #1e40af; padding: 12px 14px 14px; color: white; flex-shrink: 0; }
+.s2-title { font-size: 14px; font-weight: 700; }
+.s2-sub { font-size: 9px; opacity: 0.75; margin-top: 2px; }
+
+.total-card { margin: 10px 10px 0; background: white; border-radius: 14px; padding: 12px 14px 10px; }
+.total-lbl { font-size: 9px; color: #888; margin-bottom: 3px; }
+.total-amt { font-size: 24px; font-weight: 700; color: #1e40af; margin-bottom: 2px; }
+.total-rate { font-size: 9px; color: #059669; font-weight: 500; margin-bottom: 10px; }
+.tab-row { display: flex; border: 0.5px solid #bfdbfe; border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+.tab { flex: 1; padding: 6px 0; font-size: 9px; font-weight: 600; text-align: center; background: #f0f4ff; color: #555; border: none; }
+.tab.add-active { background: #1e40af; color: white; }
+.tab.wd-active { background: #dc2626; color: white; }
+.add-row { display: flex; gap: 6px; }
+.add-inp { flex: 1; background: #f0f4ff; border: 0.5px solid #bfdbfe; border-radius: 8px; padding: 6px 8px; font-size: 10px; text-align: right; direction: rtl; color: #333; }
+.add-btn { background: #1e40af; color: white; border: none; border-radius: 8px; padding: 6px 11px; font-size: 9px; font-weight: 600; white-space: nowrap; }
+
+.proj-card { margin: 8px 10px 0; background: white; border-radius: 14px; padding: 11px 14px; }
+.proj-hdr { font-size: 9px; font-weight: 600; color: #1e40af; margin-bottom: 8px; }
+.proj-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 0.5px solid #f0f4ff; }
+.proj-row:last-child { border-bottom: none; }
+.proj-period { font-size: 10px; color: #555; }
+.proj-right { display: flex; align-items: baseline; gap: 5px; }
+.proj-amt { font-size: 12px; font-weight: 700; color: #059669; }
+.proj-gain { font-size: 8px; color: #aaa; }
+
+.hist-sec { margin: 8px 10px 0; }
+.hist-hdr { font-size: 9px; font-weight: 600; color: #555; margin-bottom: 5px; }
+.hist-row { display: flex; align-items: center; gap: 7px; background: white; border-radius: 8px; padding: 7px 9px; margin-bottom: 5px; }
+.hist-ico { font-size: 13px; }
+.hist-info { flex: 1; }
+.hist-name { font-size: 9px; font-weight: 500; color: #333; }
+.hist-date { font-size: 7px; color: #aaa; margin-top: 1px; }
+.hist-amt { font-size: 10px; font-weight: 600; color: #1e40af; }
+</style>
+
+<div class="scene">
+
+  <!-- SCREEN 1: Dashboard -->
+  <div>
+    <div class="phone">
+      <div class="screen">
+        <div class="status" style="background:#7c3aed; color:rgba(255,255,255,0.6);">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="s1-header">
+          <div class="s1-greet">שלום,</div>
+          <div class="s1-name">יובל 👋</div>
+          <div class="bal-box">
+            <div class="bal-row"><span class="bal-lbl">עו"ש</span><span class="bal-val">₪ 262.50</span></div>
+            <div class="bal-row"><span class="bal-lbl">פיקדונות</span><span class="bal-val">₪ 80.00</span></div>
+            <div class="bal-row"><span class="bal-lbl" style="font-weight:600;">סה"כ</span><span class="bal-total-val">₪ 342.50</span></div>
+          </div>
+        </div>
+
+        <div class="mini-cards">
+          <div class="mini-card">
+            <div class="mi">⬆️</div>
+            <div class="ml">הכנסות</div>
+            <div class="mv">₪120</div>
+          </div>
+          <div class="mini-card">
+            <div class="mi">⬇️</div>
+            <div class="ml">הוצאות</div>
+            <div class="mv">₪47</div>
+          </div>
+          <div class="mini-card range-card">
+            <div class="mi">📅</div>
+            <div class="ml">טווח</div>
+            <div class="mv range">חודש</div>
+          </div>
+        </div>
+
+        <div class="scroll-body">
+          <div class="sec-title">📋 תנועות אחרונות</div>
+          <div class="tx-list">
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#f0fdf4;">🎂</div>
+              <div class="tx-info"><div class="tx-name">מתנת יום הולדת מסבא</div><div class="tx-date">היום, 10:30</div></div>
+              <div class="tx-amt plus">+₪50</div>
+            </div>
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#fff7ed;">🍕</div>
+              <div class="tx-info"><div class="tx-name">פיצה עם חברים</div><div class="tx-date">אתמול, 18:15</div></div>
+              <div class="tx-amt minus">-₪22</div>
+            </div>
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#eff6ff;">🏦</div>
+              <div class="tx-info"><div class="tx-name">הפקדה לפיקדון</div><div class="tx-date">יום ג׳, 09:00</div></div>
+              <div class="tx-amt minus">-₪80</div>
+            </div>
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#f5f0ff;">⭐</div>
+              <div class="tx-info"><div class="tx-name">דמי כיס שבועיים</div><div class="tx-date">יום ב׳, 08:00</div></div>
+              <div class="tx-amt plus">+₪30</div>
+            </div>
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#fff7ed;">🎮</div>
+              <div class="tx-info"><div class="tx-name">משחק באפליקציה</div><div class="tx-date">ראשון, 14:20</div></div>
+              <div class="tx-amt minus">-₪15</div>
+            </div>
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#f0fdf4;">🎁</div>
+              <div class="tx-info"><div class="tx-name">מתנה מדודה רחל</div><div class="tx-date">לפני 5 ימים</div></div>
+              <div class="tx-amt plus">+₪40</div>
+            </div>
+            <div class="tx-row">
+              <div class="tx-ico" style="background:#fff0f0;">📚</div>
+              <div class="tx-info"><div class="tx-name">ספר חדש</div><div class="tx-date">לפני 6 ימים</div></div>
+              <div class="tx-amt minus">-₪10</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="nav-item" style="color:#7c3aed;"><div class="nav-icon">🏠</div>בית</div>
+          <div class="nav-item"><div class="nav-icon">🏦</div>פיקדונות</div>
+        </div>
+      </div>
+    </div>
+    <div class="label">לוח בקרה ראשי</div>
+  </div>
+
+  <!-- SCREEN 2: Deposits -->
+  <div>
+    <div class="phone">
+      <div class="screen" style="background:#f0f4ff;">
+        <div class="status" style="background:#1e40af; color:rgba(255,255,255,0.6);">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="s2-header">
+          <div class="s2-title">💰 הפיקדון שלי</div>
+          <div class="s2-sub">שים כסף בצד וצפה בו גדל!</div>
+        </div>
+
+        <div class="scroll-body">
+          <div class="total-card">
+            <div class="total-lbl">סה"כ בפיקדון</div>
+            <div class="total-amt">₪ 80.00</div>
+            <div class="total-rate">ריבית שנתית 12%</div>
+            <div class="tab-row">
+              <button class="tab add-active">+ הפקדה</button>
+              <button class="tab">− משיכה</button>
+            </div>
+            <div class="add-row">
+              <input class="add-inp" placeholder="כמה להוסיף?" />
+              <button class="add-btn">הוסף</button>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-hdr">📊 כמה יהיה לי...</div>
+            <div class="proj-row">
+              <span class="proj-period">עוד חודש</span>
+              <div class="proj-right"><span class="proj-amt">₪80.80</span><span class="proj-gain">+₪0.80</span></div>
+            </div>
+            <div class="proj-row">
+              <span class="proj-period">עוד חצי שנה</span>
+              <div class="proj-right"><span class="proj-amt">₪84.80</span><span class="proj-gain">+₪4.80</span></div>
+            </div>
+            <div class="proj-row">
+              <span class="proj-period">עוד שנה</span>
+              <div class="proj-right"><span class="proj-amt">₪89.60</span><span class="proj-gain">+₪9.60</span></div>
+            </div>
+          </div>
+
+          <div class="hist-sec">
+            <div class="hist-hdr">📋 היסטוריית תנועות</div>
+            <div class="hist-row">
+              <div class="hist-ico">🏦</div>
+              <div class="hist-info"><div class="hist-name">הפקדה ראשונה</div><div class="hist-date">01.04.2025</div></div>
+              <div class="hist-amt">+₪80</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="nav-item"><div class="nav-icon">🏠</div>בית</div>
+          <div class="nav-item" style="color:#1e40af;"><div class="nav-icon">🏦</div>פיקדונות</div>
+        </div>
+      </div>
+    </div>
+    <div class="label">הפיקדון שלי</div>
+  </div>
+
+</div>
