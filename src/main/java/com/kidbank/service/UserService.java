@@ -27,6 +27,7 @@ public class UserService {
         User user = User.builder()
                 .name(req.getName())
                 .username(req.getUsername())
+                .role(req.getRole() != null ? req.getRole() : com.kidbank.model.User.Role.KID)
                 .build();
         user = userRepository.save(user);
         return toResponse(user, BigDecimal.ZERO);
@@ -35,6 +36,15 @@ public class UserService {
     public UserResponse getUser(Long userId) {
         User user = findUser(userId);
         BigDecimal depositTotal = depositRepository.findByUserId(userId)
+                .map(Deposit::getTotalAmount)
+                .orElse(BigDecimal.ZERO);
+        return toResponse(user, depositTotal);
+    }
+
+    public UserResponse findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+        BigDecimal depositTotal = depositRepository.findByUserId(user.getId())
                 .map(Deposit::getTotalAmount)
                 .orElse(BigDecimal.ZERO);
         return toResponse(user, depositTotal);
@@ -50,6 +60,7 @@ public class UserService {
                 .id(user.getId())
                 .name(user.getName())
                 .username(user.getUsername())
+                .role(user.getRole())
                 .checkingBalance(user.getCheckingBalance())
                 .depositTotal(depositTotal)
                 .totalBalance(user.getCheckingBalance().add(depositTotal))

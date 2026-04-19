@@ -1,6 +1,7 @@
 package com.kidbank.dto;
 
 import com.kidbank.model.Transaction;
+import com.kidbank.model.User;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,44 +12,51 @@ public class Dtos {
     public static class UserRequest {
         @NotBlank public String name;
         @NotBlank public String username;
+        public User.Role role = User.Role.KID;
 
         public UserRequest() {}
         public UserRequest(String name, String username) { this.name = name; this.username = username; }
+        public UserRequest(String name, String username, User.Role role) { this.name = name; this.username = username; this.role = role; }
         public String getName() { return name; }
         public String getUsername() { return username; }
+        public User.Role getRole() { return role; }
         public void setName(String n) { this.name = n; }
         public void setUsername(String u) { this.username = u; }
+        public void setRole(User.Role r) { this.role = r; }
     }
 
     public static class UserResponse {
         public Long id;
         public String name;
         public String username;
+        public User.Role role;
         public BigDecimal checkingBalance;
         public BigDecimal depositTotal;
         public BigDecimal totalBalance;
 
         public UserResponse() {}
-        public UserResponse(Long id, String name, String username,
+        public UserResponse(Long id, String name, String username, User.Role role,
                             BigDecimal checkingBalance, BigDecimal depositTotal, BigDecimal totalBalance) {
-            this.id = id; this.name = name; this.username = username;
+            this.id = id; this.name = name; this.username = username; this.role = role;
             this.checkingBalance = checkingBalance; this.depositTotal = depositTotal; this.totalBalance = totalBalance;
         }
         public static Builder builder() { return new Builder(); }
         public static class Builder {
-            private Long id; private String name; private String username;
+            private Long id; private String name; private String username; private User.Role role;
             private BigDecimal checkingBalance; private BigDecimal depositTotal; private BigDecimal totalBalance;
             public Builder id(Long id) { this.id = id; return this; }
             public Builder name(String n) { this.name = n; return this; }
             public Builder username(String u) { this.username = u; return this; }
+            public Builder role(User.Role r) { this.role = r; return this; }
             public Builder checkingBalance(BigDecimal b) { this.checkingBalance = b; return this; }
             public Builder depositTotal(BigDecimal b) { this.depositTotal = b; return this; }
             public Builder totalBalance(BigDecimal b) { this.totalBalance = b; return this; }
-            public UserResponse build() { return new UserResponse(id, name, username, checkingBalance, depositTotal, totalBalance); }
+            public UserResponse build() { return new UserResponse(id, name, username, role, checkingBalance, depositTotal, totalBalance); }
         }
         public Long getId() { return id; }
         public String getName() { return name; }
         public String getUsername() { return username; }
+        public User.Role getRole() { return role; }
         public BigDecimal getCheckingBalance() { return checkingBalance; }
         public BigDecimal getDepositTotal() { return depositTotal; }
         public BigDecimal getTotalBalance() { return totalBalance; }
