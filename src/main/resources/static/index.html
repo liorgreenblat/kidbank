@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>KidBank 🏦</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0e8ff; min-height: 100vh; direction: rtl; }
+
+/* ── Screen switching ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── Login ── */
+#login { align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(160deg, #7c3aed 0%, #a855f7 100%); }
+.login-box { background: white; border-radius: 24px; padding: 2rem; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 60px rgba(124,58,237,0.3); }
+.login-logo { font-size: 3rem; margin-bottom: 0.5rem; }
+.login-title { font-size: 1.5rem; font-weight: 700; color: #7c3aed; margin-bottom: 0.25rem; }
+.login-sub { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
+.login-field { margin-bottom: 1rem; }
+.login-field input { width: 100%; border: 1.5px solid #e0d4ff; border-radius: 12px; padding: 0.75rem 1rem; font-size: 1rem; text-align: right; outline: none; transition: border-color 0.2s; }
+.login-field input:focus { border-color: #7c3aed; }
+.login-btn { width: 100%; background: #7c3aed; color: white; border: none; border-radius: 12px; padding: 0.85rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.login-btn:active { background: #6d28d9; }
+.login-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; }
+
+/* ── App shell (dashboard + deposits) ── */
+.app-screen { background: #f5f0ff; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── Header ── */
+.header-purple { background: #7c3aed; color: white; padding: 1rem 1.25rem 1.25rem; }
+.header-blue   { background: #1e40af; color: white; padding: 1rem 1.25rem 1.25rem; }
+.header-greet { font-size: 0.8rem; opacity: 0.8; }
+.header-name  { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.75rem; }
+.bal-box { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 0.6rem 0.9rem; }
+.bal-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 0.85rem; }
+.bal-row + .bal-row { border-top: 0.5px solid rgba(255,255,255,0.2); }
+.bal-row.total { font-weight: 700; font-size: 0.95rem; }
+
+/* ── Mini cards ── */
+.mini-cards { display: flex; gap: 8px; padding: 0.75rem 1rem 0; }
+.mini-card { flex: 1; background: white; border-radius: 12px; padding: 0.6rem 0.4rem; text-align: center; cursor: pointer; transition: transform 0.1s; }
+.mini-card:active { transform: scale(0.97); }
+.mini-card.range-card { border: 1.5px solid #a855f7; }
+.mc-icon { font-size: 1.1rem; }
+.mc-label { font-size: 0.6rem; color: #777; margin: 2px 0; }
+.mc-value { font-size: 0.85rem; font-weight: 700; color: #7c3aed; }
+.mc-value.range { color: #a855f7; font-size: 0.75rem; }
+
+/* ── Section title ── */
+.sec-title { font-size: 0.8rem; font-weight: 600; color: #555; padding: 0.6rem 1rem 0.3rem; }
+
+/* ── Transactions ── */
+.tx-list { padding: 0 1rem; }
+.tx-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 0.5px solid #f0e8ff; }
+.tx-row:last-child { border-bottom: none; }
+.tx-ico { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; background: #f5f0ff; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-name { font-size: 0.8rem; font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-date { font-size: 0.65rem; color: #aaa; margin-top: 1px; }
+.tx-amt { font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
+.plus  { color: #059669; }
+.minus { color: #dc2626; }
+.empty-state { text-align: center; color: #aaa; font-size: 0.85rem; padding: 2rem 1rem; }
+
+/* ── Deposits screen ── */
+.dep-total-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 1rem 1.1rem 0.9rem; }
+.dep-lbl { font-size: 0.78rem; color: #888; margin-bottom: 2px; }
+.dep-amt { font-size: 1.75rem; font-weight: 700; color: #1e40af; }
+.dep-rate { font-size: 0.78rem; color: #059669; font-weight: 500; margin-bottom: 0.75rem; }
+.tab-row { display: flex; border: 0.5px solid #bfdbfe; border-radius: 10px; overflow: hidden; margin-bottom: 0.6rem; }
+.tab-btn { flex: 1; padding: 0.5rem 0; font-size: 0.8rem; font-weight: 600; border: none; background: #f0f4ff; color: #555; cursor: pointer; }
+.tab-btn.add-active { background: #1e40af; color: white; }
+.tab-btn.wd-active  { background: #dc2626; color: white; }
+.amt-row { display: flex; gap: 8px; }
+.amt-inp { flex: 1; background: #f0f4ff; border: 0.5px solid #bfdbfe; border-radius: 10px; padding: 0.5rem 0.75rem; font-size: 0.9rem; text-align: right; direction: rtl; color: #333; outline: none; }
+.amt-btn { background: #1e40af; color: white; border: none; border-radius: 10px; padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.amt-btn.wd { background: #dc2626; }
+.dep-msg { font-size: 0.75rem; min-height: 1.2em; margin-top: 0.4rem; }
+.dep-msg.ok  { color: #059669; }
+.dep-msg.err { color: #dc2626; }
+
+.proj-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1.1rem; }
+.proj-hdr { font-size: 0.8rem; font-weight: 600; color: #1e40af; margin-bottom: 0.6rem; }
+.proj-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 0.5px solid #f0f4ff; }
+.proj-row:last-child { border-bottom: none; }
+.proj-period { font-size: 0.85rem; color: #555; }
+.proj-right { display: flex; align-items: baseline; gap: 6px; }
+.proj-amt  { font-size: 1rem; font-weight: 700; color: #059669; }
+.proj-gain { font-size: 0.7rem; color: #aaa; }
+
+.hist-sec { margin: 0.75rem 1rem 0; }
+.hist-hdr { font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 0.4rem; }
+.hist-row { display: flex; align-items: center; gap: 8px; background: white; border-radius: 10px; padding: 0.55rem 0.75rem; margin-bottom: 6px; }
+.hist-ico  { font-size: 1.1rem; }
+.hist-info { flex: 1; min-width: 0; }
+.hist-name { font-size: 0.8rem; font-weight: 500; color: #333; }
+.hist-date { font-size: 0.65rem; color: #aaa; margin-top: 1px; }
+.hist-amt  { font-size: 0.85rem; font-weight: 700; color: #1e40af; white-space: nowrap; }
+
+/* ── Bottom nav ── */
+.nav { display: flex; background: white; border-top: 0.5px solid #e5e7eb; position: sticky; bottom: 0; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 10px; font-size: 0.65rem; color: #aaa; cursor: pointer; border: none; background: none; }
+.nav-item.active { color: #7c3aed; }
+.nav-item .nav-icon { font-size: 1.3rem; }
+
+/* ── Scroll body ── */
+.scroll-body { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
+.scroll-body::-webkit-scrollbar { width: 0; }
+
+/* ── Loading spinner ── */
+.spinner { text-align: center; padding: 2rem; color: #aaa; font-size: 0.85rem; }
+
+/* ── Logout btn ── */
+.logout-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 0.75rem; cursor: pointer; padding: 0; }
+.logout-btn:active { color: white; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div id="login" class="screen active">
+  <div class="login-box">
+    <div class="login-logo">🏦</div>
+    <div class="login-title">KidBank</div>
+    <div class="login-sub">הבנק שלי</div>
+
+    <div class="login-field">
+      <input id="inp-username" type="text" placeholder="שם משתמש" autocomplete="username" />
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="handleLogin()">כניסה</button>
+    <div id="login-error" class="login-error"></div>
+  </div>
+</div>
+
+<!-- ══════════ DASHBOARD SCREEN ══════════ -->
+<div id="dashboard" class="screen app-screen">
+  <div class="header-purple">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="header-greet">שלום,</div>
+        <div class="header-name" id="dash-name">...</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+    <div class="bal-box">
+      <div class="bal-row"><span>עו"ש</span><span id="dash-checking">₪ —</span></div>
+      <div class="bal-row"><span>פיקדונות</span><span id="dash-deposit">₪ —</span></div>
+      <div class="bal-row total"><span>סה"כ</span><span id="dash-total">₪ —</span></div>
+    </div>
+  </div>
+
+  <div class="mini-cards">
+    <div class="mini-card">
+      <div class="mc-icon">⬆️</div>
+      <div class="mc-label">הכנסות</div>
+      <div class="mc-value" id="dash-income">—</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">⬇️</div>
+      <div class="mc-label">הוצאות</div>
+      <div class="mc-value" id="dash-expenses">—</div>
+    </div>
+    <div class="mini-card range-card" onclick="cycleRange()">
+      <div class="mc-icon">📅</div>
+      <div class="mc-label">טווח</div>
+      <div class="mc-value range" id="dash-range">חודש</div>
+    </div>
+  </div>
+
+  <div class="scroll-body">
+    <div class="sec-title">📋 תנועות אחרונות</div>
+    <div class="tx-list" id="tx-list"><div class="spinner">טוען...</div></div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active" onclick="showScreen('dashboard')">
+      <span class="nav-icon">🏠</span>בית
+    </button>
+    <button class="nav-item" onclick="showScreen('deposits')">
+      <span class="nav-icon">🏦</span>פיקדונות
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════ DEPOSITS SCREEN ══════════ -->
+<div id="deposits" class="screen app-screen">
+  <div class="header-blue">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="header-name">💰 הפיקדון שלי</div>
+        <div class="header-greet">שים כסף בצד וצפה בו גדל!</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+  </div>
+
+  <div class="scroll-body">
+    <div class="dep-total-card">
+      <div class="dep-lbl">סה"כ בפיקדון</div>
+      <div class="dep-amt" id="dep-total">₪ —</div>
+      <div class="dep-rate" id="dep-rate">ריבית שנתית —%</div>
+
+      <div class="tab-row">
+        <button class="tab-btn add-active" id="tab-add" onclick="setDepTab('add')">+ הפקדה</button>
+        <button class="tab-btn"            id="tab-wd"  onclick="setDepTab('wd')">− משיכה</button>
+      </div>
+      <div class="amt-row">
+        <input class="amt-inp" id="dep-input" type="number" min="0" placeholder="כמה ₪?" />
+        <button class="amt-btn" id="dep-action-btn" onclick="handleDepositAction()">הוסף</button>
+      </div>
+      <div class="dep-msg" id="dep-msg"></div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-hdr">📊 כמה יהיה לי...</div>
+      <div class="proj-row">
+        <span class="proj-period">עוד חודש</span>
+        <div class="proj-right"><span class="proj-amt" id="proj-1m">—</span><span class="proj-gain" id="proj-1m-gain"></span></div>
+      </div>
+      <div class="proj-row">
+        <span class="proj-period">עוד חצי שנה</span>
+        <div class="proj-right"><span class="proj-amt" id="proj-6m">—</span><span class="proj-gain" id="proj-6m-gain"></span></div>
+      </div>
+      <div class="proj-row">
+        <span class="proj-period">עוד שנה</span>
+        <div class="proj-right"><span class="proj-amt" id="proj-1y">—</span><span class="proj-gain" id="proj-1y-gain"></span></div>
+      </div>
+    </div>
+
+    <div class="hist-sec">
+      <div class="hist-hdr">📋 היסטוריית תנועות</div>
+      <div id="dep-hist"><div class="spinner">טוען...</div></div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item" onclick="showScreen('dashboard')">
+      <span class="nav-icon">🏠</span>בית
+    </button>
+    <button class="nav-item active" onclick="showScreen('deposits')">
+      <span class="nav-icon">🏦</span>פיקדונות
+    </button>
+  </nav>
+</div>
+
+<script>
+const API = '';  // same origin — change to 'http://your-server' for external deployment
+
+// ── State ────────────────────────────────────────────────
+const state = {
+  userId: localStorage.getItem('kidbank_userId'),
+  userName: localStorage.getItem('kidbank_userName'),
+  range: 'month',
+  depTab: 'add',
+};
+
+const RANGES = ['month', 'half', 'year'];
+const RANGE_LABELS = { month: 'חודש', half: 'חצי שנה', year: 'שנה' };
+
+const CATEGORY_EMOJI = {
+  ALLOWANCE: '⭐', BIRTHDAY: '🎂', GIFT: '🎁',
+  FOOD: '🍕', ENTERTAINMENT: '🎮', BOOKS: '📚',
+  TOYS: '🧸', SAVINGS: '🏦', OTHER: '💰',
+};
+const TYPE_EMOJI = { INCOME: '💵', EXPENSE: '🛍️', DEPOSIT_IN: '🏦', DEPOSIT_OUT: '🏦' };
+
+// ── Helpers ───────────────────────────────────────────────
+const fmt = n => '₪ ' + Number(n).toFixed(2);
+const fmtShort = n => '₪' + Number(n).toFixed(0);
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'היום, ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  if (diff === 1) return 'אתמול, ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  if (diff < 7)  return `לפני ${diff} ימים`;
+  return d.toLocaleDateString('he-IL');
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.title || 'שגיאה');
+  }
+  return res.json();
+}
+
+// ── Screen switching ──────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'deposits')  loadDeposits();
+}
+
+// ── Login flow ────────────────────────────────────────────
+async function handleLogin() {
+  const username = document.getElementById('inp-username').value.trim();
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+
+  if (!username) { errEl.textContent = 'נא להזין שם משתמש'; return; }
+
+  try {
+    const user = await api(`/api/users/by-username?username=${encodeURIComponent(username)}`);
+    saveUser(user);
+  } catch (e) {
+    errEl.textContent = '❌ שם משתמש לא קיים. פנה להורה.';
+  }
+}
+
+function saveUser(user) {
+  state.userId = user.id;
+  state.userName = user.name;
+  localStorage.setItem('kidbank_userId', user.id);
+  localStorage.setItem('kidbank_userName', user.name);
+  showScreen('dashboard');
+}
+
+function logout() {
+  localStorage.removeItem('kidbank_userId');
+  localStorage.removeItem('kidbank_userName');
+  state.userId = null;
+  document.getElementById('inp-username').value = '';
+  document.getElementById('login-error').textContent = '';
+  showScreen('login');
+}
+
+// ── Dashboard ─────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [user, summary, txs] = await Promise.all([
+      api(`/api/users/${state.userId}`),
+      api(`/api/users/${state.userId}/transactions/summary?range=${state.range}`),
+      api(`/api/users/${state.userId}/transactions?range=${state.range}`),
+    ]);
+
+    document.getElementById('dash-name').textContent = user.name + ' 👋';
+    document.getElementById('dash-checking').textContent = fmt(user.checkingBalance);
+    document.getElementById('dash-deposit').textContent  = fmt(user.depositTotal);
+    document.getElementById('dash-total').textContent    = fmt(user.totalBalance);
+    document.getElementById('dash-income').textContent   = fmtShort(summary.totalIncome);
+    document.getElementById('dash-expenses').textContent = fmtShort(summary.totalExpenses);
+
+    renderTxList(txs);
+  } catch (e) {
+    document.getElementById('tx-list').innerHTML = `<div class="empty-state">${e.message}</div>`;
+  }
+}
+
+function renderTxList(txs) {
+  const el = document.getElementById('tx-list');
+  if (!txs.length) { el.innerHTML = '<div class="empty-state">אין תנועות בטווח זה</div>'; return; }
+  el.innerHTML = txs.map(tx => {
+    const emoji = CATEGORY_EMOJI[tx.category] || TYPE_EMOJI[tx.type] || '💰';
+    const isPlus = tx.type === 'INCOME' || tx.type === 'DEPOSIT_OUT';
+    const sign = isPlus ? '+' : '-';
+    const cls  = isPlus ? 'plus' : 'minus';
+    return `
+      <div class="tx-row">
+        <div class="tx-ico">${emoji}</div>
+        <div class="tx-info">
+          <div class="tx-name">${tx.description || categoryLabel(tx.category) || typeLabel(tx.type)}</div>
+          <div class="tx-date">${fmtDate(tx.createdAt)}</div>
+        </div>
+        <div class="tx-amt ${cls}">${sign}${fmt(tx.amount)}</div>
+      </div>`;
+  }).join('');
+}
+
+function categoryLabel(c) {
+  const map = { ALLOWANCE:'דמי כיס', BIRTHDAY:'מתנת יום הולדת', GIFT:'מתנה',
+    FOOD:'אוכל', ENTERTAINMENT:'בידור', BOOKS:'ספרים', TOYS:'צעצועים', SAVINGS:'חסכונות', OTHER:'אחר' };
+  return map[c] || '';
+}
+function typeLabel(t) {
+  return { INCOME:'הכנסה', EXPENSE:'הוצאה', DEPOSIT_IN:'הפקדה', DEPOSIT_OUT:'משיכה מפיקדון' }[t] || t;
+}
+
+function cycleRange() {
+  const i = RANGES.indexOf(state.range);
+  state.range = RANGES[(i + 1) % RANGES.length];
+  document.getElementById('dash-range').textContent = RANGE_LABELS[state.range];
+  loadDashboard();
+}
+
+// ── Deposits ──────────────────────────────────────────────
+async function loadDeposits() {
+  try {
+    const dep = await api(`/api/users/${state.userId}/deposit`);
+    renderDeposit(dep);
+
+    const txs = await api(`/api/users/${state.userId}/transactions`);
+    const depTxs = txs.filter(t => t.type === 'DEPOSIT_IN' || t.type === 'DEPOSIT_OUT');
+    renderDepHistory(depTxs);
+  } catch (e) {
+    document.getElementById('dep-hist').innerHTML = `<div class="empty-state">${e.message}</div>`;
+  }
+}
+
+function renderDeposit(dep) {
+  const rate = (dep.interestRate * 100).toFixed(0);
+  document.getElementById('dep-total').textContent  = fmt(dep.totalAmount);
+  document.getElementById('dep-rate').textContent   = `ריבית שנתית ${rate}%`;
+
+  const gain = (projected, base) => {
+    const g = (projected - base).toFixed(2);
+    return g > 0 ? `+₪${g}` : '';
+  };
+  const base = Number(dep.totalAmount);
+  document.getElementById('proj-1m').textContent      = fmt(dep.projectedOneMonth);
+  document.getElementById('proj-1m-gain').textContent = gain(dep.projectedOneMonth, base);
+  document.getElementById('proj-6m').textContent      = fmt(dep.projectedSixMonths);
+  document.getElementById('proj-6m-gain').textContent = gain(dep.projectedSixMonths, base);
+  document.getElementById('proj-1y').textContent      = fmt(dep.projectedOneYear);
+  document.getElementById('proj-1y-gain').textContent = gain(dep.projectedOneYear, base);
+}
+
+function renderDepHistory(txs) {
+  const el = document.getElementById('dep-hist');
+  if (!txs.length) { el.innerHTML = '<div class="empty-state">אין תנועות פיקדון עדיין</div>'; return; }
+  el.innerHTML = txs.map(tx => {
+    const isIn = tx.type === 'DEPOSIT_IN';
+    return `
+      <div class="hist-row">
+        <div class="hist-ico">🏦</div>
+        <div class="hist-info">
+          <div class="hist-name">${tx.description || typeLabel(tx.type)}</div>
+          <div class="hist-date">${fmtDate(tx.createdAt)}</div>
+        </div>
+        <div class="hist-amt" style="color:${isIn ? '#059669' : '#dc2626'}">${isIn ? '+' : '-'}${fmt(tx.amount)}</div>
+      </div>`;
+  }).join('');
+}
+
+function setDepTab(tab) {
+  state.depTab = tab;
+  document.getElementById('tab-add').className = 'tab-btn' + (tab === 'add' ? ' add-active' : '');
+  document.getElementById('tab-wd').className  = 'tab-btn' + (tab === 'wd'  ? ' wd-active'  : '');
+  document.getElementById('dep-action-btn').textContent = tab === 'add' ? 'הוסף' : 'משוך';
+  document.getElementById('dep-action-btn').className   = 'amt-btn' + (tab === 'wd' ? ' wd' : '');
+  document.getElementById('dep-msg').textContent = '';
+}
+
+async function handleDepositAction() {
+  const raw = document.getElementById('dep-input').value;
+  const amount = parseFloat(raw);
+  const msgEl = document.getElementById('dep-msg');
+  msgEl.className = 'dep-msg';
+  if (!amount || amount <= 0) { msgEl.className = 'dep-msg err'; msgEl.textContent = 'נא להזין סכום תקין'; return; }
+
+  const path = state.depTab === 'add'
+    ? `/api/users/${state.userId}/deposit/add`
+    : `/api/users/${state.userId}/deposit/withdraw`;
+
+  try {
+    const dep = await api(path, { method: 'POST', body: JSON.stringify({ amount }) });
+    renderDeposit(dep);
+    document.getElementById('dep-input').value = '';
+    msgEl.className = 'dep-msg ok';
+    msgEl.textContent = state.depTab === 'add' ? '✓ הופקד בהצלחה!' : '✓ נמשך בהצלחה!';
+    loadDeposits();
+  } catch (e) {
+    msgEl.className = 'dep-msg err';
+    msgEl.textContent = e.message;
+  }
+}
+
+// ── Enter key on login inputs ─────────────────────────────
+document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+document.getElementById('inp-name').addEventListener('keydown',     e => { if (e.key === 'Enter') handleLogin(); });
+
+// ── Auto-login if session saved ───────────────────────────
+if (state.userId) showScreen('dashboard');
+</script>
+</body>
+</html>
