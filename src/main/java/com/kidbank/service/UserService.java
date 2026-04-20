@@ -3,6 +3,7 @@ package com.kidbank.service;
 import com.kidbank.dto.Dtos.*;
 import com.kidbank.model.Deposit;
 import com.kidbank.model.User;
+import java.util.List;
 import com.kidbank.repository.DepositRepository;
 import com.kidbank.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,15 @@ public class UserService {
                 .map(Deposit::getTotalAmount)
                 .orElse(BigDecimal.ZERO);
         return toResponse(user, depositTotal);
+    }
+
+    public List<UserResponse> getKids() {
+        return userRepository.findByRole(com.kidbank.model.User.Role.KID).stream()
+                .map(u -> {
+                    BigDecimal depositTotal = depositRepository.findByUserId(u.getId())
+                            .map(Deposit::getTotalAmount).orElse(BigDecimal.ZERO);
+                    return toResponse(u, depositTotal);
+                }).toList();
     }
 
     public UserResponse findByUsername(String username) {

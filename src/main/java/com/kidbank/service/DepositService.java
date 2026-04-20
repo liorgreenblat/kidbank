@@ -15,18 +15,19 @@ import java.math.RoundingMode;
 @Service
 public class DepositService {
 
-    private static final BigDecimal DEFAULT_RATE = new BigDecimal("0.12");
-
     private final DepositRepository depositRepository;
     private final TransactionRepository transactionRepository;
     private final UserService userService;
+    private final AppSettingsService appSettingsService;
 
     public DepositService(DepositRepository depositRepository,
                           TransactionRepository transactionRepository,
-                          UserService userService) {
+                          UserService userService,
+                          AppSettingsService appSettingsService) {
         this.depositRepository = depositRepository;
         this.transactionRepository = transactionRepository;
         this.userService = userService;
+        this.appSettingsService = appSettingsService;
     }
 
     public DepositResponse getDeposit(Long userId) {
@@ -97,9 +98,10 @@ public class DepositService {
     private Deposit getOrCreate(Long userId) {
         return depositRepository.findByUserId(userId).orElseGet(() -> {
             User user = userService.findUser(userId);
+            BigDecimal rate = appSettingsService.getOrCreate().getGlobalInterestRate();
             return depositRepository.save(Deposit.builder()
                     .user(user)
-                    .interestRate(DEFAULT_RATE)
+                    .interestRate(rate)
                     .build());
         });
     }

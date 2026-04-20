@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -30,5 +32,10 @@ public class UserController {
     @GetMapping("/by-username")
     public UserResponse getUserByUsername(@RequestParam String username) {
         return userService.findByUsername(username);
+    }
+
+    @GetMapping
+    public List<UserResponse> getKids() {
+        return userService.getKids();
     }
 }

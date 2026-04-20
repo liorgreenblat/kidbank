@@ -84,6 +84,46 @@ public class TransactionService {
         };
     }
 
+    @Transactional
+    public TransactionResponse voidTransaction(Long userId, Long txId) {
+        User user = userService.findUser(userId);
+        Transaction original = transactionRepository.findById(txId)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + txId));
+
+        if (!original.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Transaction does not belong to this user");
+        }
+        if (original.isVoided()) {
+            throw new IllegalArgumentException("Transaction already voided");
+        }
+
+        // reverse the balance effect
+        if (original.getType() == Type.INCOME) {
+            if (user.getCheckingBalance().compareTo(original.getAmount()) < 0) {
+                throw new IllegalArgumentException("Insufficient balance to void this transaction");
+            }
+            user.setCheckingBalance(user.getCheckingBalance().subtract(original.getAmount()));
+        } else if (original.getType() == Type.EXPENSE) {
+            user.setCheckingBalance(user.getCheckingBalance().add(original.getAmount()));
+        }
+
+        // create counter-transaction
+        Transaction counter = Transaction.builder()
+                .user(user)
+                .type(original.getType() == Type.INCOME ? Type.EXPENSE : Type.INCOME)
+                .amount(original.getAmount())
+                .description("תיקון: " + (original.getDescription() != null ? original.getDescription() : ""))
+                .category(original.getCategory())
+                .build();
+        counter = transactionRepository.save(counter);
+
+        original.setVoided(true);
+        original.setVoidedBy(counter.getId());
+        transactionRepository.save(original);
+
+        return toResponse(original);
+    }
+
     private TransactionResponse toResponse(Transaction tx) {
         return TransactionResponse.builder()
                 .id(tx.getId())
@@ -91,6 +131,8 @@ public class TransactionService {
                 .amount(tx.getAmount())
                 .description(tx.getDescription())
                 .category(tx.getCategory())
+                .voided(tx.isVoided())
+                .voidedBy(tx.getVoidedBy())
                 .createdAt(tx.getCreatedAt())
                 .build();
     }

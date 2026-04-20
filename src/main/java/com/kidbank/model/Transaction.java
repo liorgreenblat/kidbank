@@ -45,17 +45,25 @@ public class Transaction {
     private Category category;
 
     @Column(nullable = false)
+    private boolean voided = false;
+
+    @Column
+    private Long voidedBy;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Transaction() {}
 
-    public Transaction(Long id, User user, Type type, BigDecimal amount, String description, Category category, LocalDateTime createdAt) {
+    public Transaction(Long id, User user, Type type, BigDecimal amount, String description, Category category, boolean voided, Long voidedBy, LocalDateTime createdAt) {
         this.id = id;
         this.user = user;
         this.type = type;
         this.amount = amount;
         this.description = description;
         this.category = category;
+        this.voided = voided;
+        this.voidedBy = voidedBy;
         this.createdAt = createdAt;
     }
 
@@ -68,6 +76,8 @@ public class Transaction {
         private BigDecimal amount;
         private String description;
         private Category category;
+        private boolean voided = false;
+        private Long voidedBy;
         private LocalDateTime createdAt = LocalDateTime.now();
 
         public Builder id(Long id) { this.id = id; return this; }
@@ -76,8 +86,10 @@ public class Transaction {
         public Builder amount(BigDecimal a) { this.amount = a; return this; }
         public Builder description(String d) { this.description = d; return this; }
         public Builder category(Category c) { this.category = c; return this; }
+        public Builder voided(boolean v) { this.voided = v; return this; }
+        public Builder voidedBy(Long id) { this.voidedBy = id; return this; }
         public Builder createdAt(LocalDateTime t) { this.createdAt = t; return this; }
-        public Transaction build() { return new Transaction(id, user, type, amount, description, category, createdAt); }
+        public Transaction build() { return new Transaction(id, user, type, amount, description, category, voided, voidedBy, createdAt); }
     }
 
     public Long getId() { return id; }
@@ -86,6 +98,8 @@ public class Transaction {
     public BigDecimal getAmount() { return amount; }
     public String getDescription() { return description; }
     public Category getCategory() { return category; }
+    public boolean isVoided() { return voided; }
+    public Long getVoidedBy() { return voidedBy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setId(Long id) { this.id = id; }
     public void setUser(User user) { this.user = user; }
@@ -93,5 +107,7 @@ public class Transaction {
     public void setAmount(BigDecimal a) { this.amount = a; }
     public void setDescription(String d) { this.description = d; }
     public void setCategory(Category c) { this.category = c; }
+    public void setVoided(boolean v) { this.voided = v; }
+    public void setVoidedBy(Long id) { this.voidedBy = id; }
     public void setCreatedAt(LocalDateTime t) { this.createdAt = t; }
 }

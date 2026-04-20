@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parent Screens Mockup</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f0fdf4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 2rem 1rem; direction: rtl; }
+.scene { display: flex; gap: 28px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+.phone { width: 220px; background: #1a1a2e; border-radius: 32px; padding: 12px; box-shadow: 0 0 0 2px #2a2a3e; flex-shrink: 0; }
+.screen { border-radius: 22px; overflow: hidden; height: 480px; position: relative; direction: rtl; display: flex; flex-direction: column; background: #f0fdf4; }
+.status { height: 20px; min-height: 20px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 9px; direction: ltr; flex-shrink: 0; }
+.scroll-body { flex: 1; overflow-y: auto; padding-bottom: 48px; }
+.scroll-body::-webkit-scrollbar { width: 0; }
+.nav { display: flex; justify-content: space-around; padding: 8px 6px; border-top: 0.5px solid #e5e7eb; position: absolute; bottom: 0; left: 0; right: 0; background: white; border-radius: 0 0 22px 22px; height: 44px; z-index: 10; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 7px; color: #aaa; border: none; background: none; cursor: pointer; }
+.nav-item.active { color: #059669; }
+.nav-icon { font-size: 14px; }
+.label { text-align: center; font-size: 11px; color: #555; margin-top: 10px; font-weight: 500; }
+
+/* ── Headers ── */
+.hdr-green { background: #065f46; color: white; padding: 10px 12px 12px; flex-shrink: 0; }
+.hdr-title { font-size: 13px; font-weight: 700; }
+.hdr-sub   { font-size: 8px; opacity: 0.7; margin-top: 1px; }
+.back-row  { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.back-btn  { font-size: 9px; opacity: 0.8; }
+
+/* ── Screen 1: Kids overview ── */
+.kid-card { margin: 8px 10px 0; background: white; border-radius: 14px; padding: 10px 12px; }
+.kid-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.kid-name { font-size: 13px; font-weight: 700; color: #065f46; }
+.kid-role { font-size: 7px; background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 99px; font-weight: 600; }
+.kid-total { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 4px; }
+.kid-breakdown { display: flex; gap: 8px; margin-bottom: 8px; }
+.kid-bal-item { flex: 1; background: #f0fdf4; border-radius: 8px; padding: 4px 6px; text-align: center; }
+.kbi-lbl { font-size: 7px; color: #888; }
+.kbi-val { font-size: 10px; font-weight: 600; color: #065f46; }
+.transfer-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 8px; padding: 6px; font-size: 9px; font-weight: 600; cursor: pointer; }
+
+/* ── Screen 2: Kid detail ── */
+.detail-bal { background: #065f46; color: white; padding: 8px 12px 12px; flex-shrink: 0; }
+.detail-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.detail-bal-row { display: flex; justify-content: space-between; font-size: 9px; padding: 3px 0; }
+.detail-bal-row + .detail-bal-row { border-top: 0.5px solid rgba(255,255,255,0.2); }
+.detail-bal-row.total { font-weight: 700; font-size: 10px; }
+
+.sec-title { font-size: 9px; font-weight: 600; color: #555; padding: 8px 10px 4px; display: flex; justify-content: space-between; align-items: center; }
+.tx-list { padding: 0 10px; }
+.tx-row { display: flex; align-items: center; gap: 7px; padding: 6px 0; border-bottom: 0.5px solid #ecfdf5; }
+.tx-row:last-child { border-bottom: none; }
+.tx-row.voided { opacity: 0.45; }
+.tx-ico { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; background: #f0fdf4; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-name { font-size: 9px; font-weight: 500; color: #333; }
+.tx-name.struck { text-decoration: line-through; color: #aaa; }
+.tx-date { font-size: 7px; color: #aaa; margin-top: 1px; }
+.tx-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.tx-amt { font-size: 10px; font-weight: 600; white-space: nowrap; }
+.plus  { color: #059669; }
+.minus { color: #dc2626; }
+.voided-tag { font-size: 6px; background: #fee2e2; color: #dc2626; padding: 1px 4px; border-radius: 99px; font-weight: 600; }
+.void-btn { font-size: 7px; background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; padding: 2px 5px; cursor: pointer; white-space: nowrap; }
+
+/* ── Screen 3: Transfer ── */
+.transfer-screen { background: #f0fdf4; }
+.kid-tabs { display: flex; gap: 6px; padding: 8px 10px 0; flex-shrink: 0; }
+.kid-tab { flex: 1; background: white; border: 1.5px solid #d1fae5; border-radius: 10px; padding: 5px 0; font-size: 10px; font-weight: 600; color: #888; text-align: center; cursor: pointer; }
+.kid-tab.active { background: #059669; color: white; border-color: #059669; }
+.form-card { margin: 8px 10px 0; background: white; border-radius: 14px; padding: 10px 12px; }
+.form-lbl { font-size: 8px; color: #888; margin-bottom: 3px; font-weight: 500; }
+.form-input { width: 100%; border: 1px solid #d1fae5; border-radius: 8px; padding: 6px 8px; font-size: 11px; text-align: right; direction: rtl; color: #333; margin-bottom: 8px; background: #f0fdf4; }
+.cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 8px; }
+.cat-btn { background: #f0fdf4; border: 1px solid #d1fae5; border-radius: 8px; padding: 5px 4px; font-size: 8px; color: #555; cursor: pointer; text-align: center; }
+.cat-btn.active { background: #059669; color: white; border-color: #059669; }
+.confirm-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 10px; padding: 8px; font-size: 10px; font-weight: 700; cursor: pointer; margin-top: 4px; }
+
+/* ── Screen 4: Settings ── */
+.settings-screen { background: #f0fdf4; }
+.settings-card { margin: 8px 10px 0; background: white; border-radius: 14px; padding: 10px 12px; }
+.settings-title { font-size: 9px; font-weight: 700; color: #065f46; margin-bottom: 8px; }
+.rate-row { display: flex; align-items: center; gap: 8px; }
+.rate-inp { flex: 1; border: 1px solid #d1fae5; border-radius: 8px; padding: 6px 8px; font-size: 14px; font-weight: 700; color: #059669; text-align: center; background: #f0fdf4; }
+.rate-unit { font-size: 9px; color: #888; }
+.rate-save { background: #059669; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 9px; font-weight: 600; cursor: pointer; }
+.divider { height: 0.5px; background: #d1fae5; margin: 8px 0; }
+.pin-row { display: flex; justify-content: space-between; align-items: center; }
+.pin-label { font-size: 9px; color: #333; font-weight: 500; }
+.pin-dots { display: flex; gap: 4px; }
+.pin-dot { width: 10px; height: 10px; border-radius: 50%; background: #059669; }
+.pin-change { font-size: 8px; color: #059669; background: none; border: none; cursor: pointer; font-weight: 600; }
+
+.pin-entry { margin-top: 8px; }
+.pin-hint { font-size: 8px; color: #888; margin-bottom: 6px; }
+.pin-inputs { display: flex; gap: 6px; justify-content: center; }
+.pin-inp { width: 28px; height: 32px; border: 1.5px solid #d1fae5; border-radius: 8px; text-align: center; font-size: 14px; font-weight: 700; color: #065f46; background: #f0fdf4; }
+.pin-inp.filled { border-color: #059669; background: #ecfdf5; }
+
+.kids-interest { margin-top: 6px; }
+.ki-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 0.5px solid #f0fdf4; font-size: 9px; }
+.ki-row:last-child { border-bottom: none; }
+.ki-name { color: #333; font-weight: 500; }
+.ki-rate { color: #059669; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="scene">
+
+  <!-- SCREEN 1: Kids Overview -->
+  <div>
+    <div class="phone">
+      <div class="screen">
+        <div class="status" style="background:#065f46; color:rgba(255,255,255,0.6);">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="hdr-green">
+          <div class="hdr-title">👨‍👩‍👧‍👦 הילדים שלי</div>
+          <div class="hdr-sub">שלום ליאור — מצב כולל</div>
+        </div>
+
+        <div class="scroll-body">
+          <!-- Kid: בר -->
+          <div class="kid-card">
+            <div class="kid-card-top">
+              <div class="kid-name">בר 🧒</div>
+              <div class="kid-role">ילד/ה</div>
+            </div>
+            <div class="kid-total">₪ 342.50</div>
+            <div class="kid-breakdown">
+              <div class="kid-bal-item"><div class="kbi-lbl">עו"ש</div><div class="kbi-val">₪262.50</div></div>
+              <div class="kid-bal-item"><div class="kbi-lbl">פיקדון</div><div class="kbi-val">₪80.00</div></div>
+            </div>
+            <button class="transfer-btn">💸 העבר כסף לבר</button>
+          </div>
+
+          <!-- Kid: גל -->
+          <div class="kid-card">
+            <div class="kid-card-top">
+              <div class="kid-name">גל 🧒</div>
+              <div class="kid-role">ילד/ה</div>
+            </div>
+            <div class="kid-total">₪ 175.00</div>
+            <div class="kid-breakdown">
+              <div class="kid-bal-item"><div class="kbi-lbl">עו"ש</div><div class="kbi-val">₪125.00</div></div>
+              <div class="kid-bal-item"><div class="kbi-lbl">פיקדון</div><div class="kbi-val">₪50.00</div></div>
+            </div>
+            <button class="transfer-btn">💸 העבר כסף לגל</button>
+          </div>
+        </div>
+
+        <div class="nav">
+          <button class="nav-item active"><div class="nav-icon">👨‍👩‍👧‍👦</div>ילדים</button>
+          <button class="nav-item"><div class="nav-icon">💸</div>העברה</button>
+          <button class="nav-item"><div class="nav-icon">⚙️</div>הגדרות</button>
+        </div>
+      </div>
+    </div>
+    <div class="label">סקירת ילדים</div>
+  </div>
+
+  <!-- SCREEN 2: Kid Detail -->
+  <div>
+    <div class="phone">
+      <div class="screen">
+        <div class="status" style="background:#065f46; color:rgba(255,255,255,0.6);">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="detail-bal">
+          <div class="back-row">
+            <span class="back-btn">← חזרה</span>
+          </div>
+          <div class="detail-name">בר 🧒</div>
+          <div class="detail-bal-row"><span>עו"ש</span><span>₪ 262.50</span></div>
+          <div class="detail-bal-row"><span>פיקדון</span><span>₪ 80.00</span></div>
+          <div class="detail-bal-row total"><span>סה"כ</span><span>₪ 342.50</span></div>
+        </div>
+
+        <div class="scroll-body">
+          <div class="sec-title">
+            <span>📋 כל התנועות</span>
+          </div>
+          <div class="tx-list">
+
+            <!-- normal tx -->
+            <div class="tx-row">
+              <div class="tx-ico">⭐</div>
+              <div class="tx-info">
+                <div class="tx-name">דמי כיס שבועיים</div>
+                <div class="tx-date">היום, 08:00</div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amt plus">+₪30</div>
+                <button class="void-btn">ביטול</button>
+              </div>
+            </div>
+
+            <!-- normal tx -->
+            <div class="tx-row">
+              <div class="tx-ico">🍕</div>
+              <div class="tx-info">
+                <div class="tx-name">פיצה עם חברים</div>
+                <div class="tx-date">אתמול, 18:15</div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amt minus">-₪22</div>
+                <button class="void-btn">ביטול</button>
+              </div>
+            </div>
+
+            <!-- VOIDED tx -->
+            <div class="tx-row voided">
+              <div class="tx-ico">🎮</div>
+              <div class="tx-info">
+                <div class="tx-name struck">משחק באפליקציה</div>
+                <div class="tx-date">יום ג׳, 14:20</div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amt minus" style="text-decoration:line-through;">-₪15</div>
+                <div class="voided-tag">בוטל</div>
+              </div>
+            </div>
+
+            <!-- counter-tx for the void above -->
+            <div class="tx-row">
+              <div class="tx-ico">↩️</div>
+              <div class="tx-info">
+                <div class="tx-name" style="color:#888;">תיקון: משחק באפליקציה</div>
+                <div class="tx-date">יום ג׳, 14:22 · הורה</div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amt plus">+₪15</div>
+              </div>
+            </div>
+
+            <!-- normal tx -->
+            <div class="tx-row">
+              <div class="tx-ico">🎂</div>
+              <div class="tx-info">
+                <div class="tx-name">מתנת יום הולדת</div>
+                <div class="tx-date">לפני 5 ימים</div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amt plus">+₪50</div>
+                <button class="void-btn">ביטול</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="nav">
+          <button class="nav-item active"><div class="nav-icon">👨‍👩‍👧‍👦</div>ילדים</button>
+          <button class="nav-item"><div class="nav-icon">💸</div>העברה</button>
+          <button class="nav-item"><div class="nav-icon">⚙️</div>הגדרות</button>
+        </div>
+      </div>
+    </div>
+    <div class="label">פרטי ילד + ביטול תנועה</div>
+  </div>
+
+  <!-- SCREEN 3: Transfer Money -->
+  <div>
+    <div class="phone">
+      <div class="screen transfer-screen">
+        <div class="status" style="background:#065f46; color:rgba(255,255,255,0.6);">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="hdr-green">
+          <div class="hdr-title">💸 העבר כסף</div>
+          <div class="hdr-sub">הפקד ישירות לחשבון הילד</div>
+        </div>
+
+        <div class="scroll-body">
+          <!-- Kid selector -->
+          <div style="padding: 8px 10px 0;">
+            <div class="form-lbl">בחר ילד/ה</div>
+            <div class="kid-tabs">
+              <div class="kid-tab active">בר</div>
+              <div class="kid-tab">גל</div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <!-- Amount -->
+            <div class="form-lbl">סכום</div>
+            <input class="form-input" value="30" style="font-size:20px; font-weight:700; color:#059669;" />
+
+            <!-- Category -->
+            <div class="form-lbl">סיבה</div>
+            <div class="cat-grid">
+              <div class="cat-btn active">⭐ דמי כיס</div>
+              <div class="cat-btn">🎁 מתנה</div>
+              <div class="cat-btn">🎂 יום הולדת</div>
+              <div class="cat-btn">💰 אחר</div>
+            </div>
+
+            <!-- Note -->
+            <div class="form-lbl">הערה (אופציונלי)</div>
+            <input class="form-input" placeholder="לדוגמה: דמי כיס לשבוע זה" />
+
+            <button class="confirm-btn">✓ העבר ₪30 לבר</button>
+          </div>
+        </div>
+
+        <div class="nav">
+          <button class="nav-item"><div class="nav-icon">👨‍👩‍👧‍👦</div>ילדים</button>
+          <button class="nav-item active"><div class="nav-icon">💸</div>העברה</button>
+          <button class="nav-item"><div class="nav-icon">⚙️</div>הגדרות</button>
+        </div>
+      </div>
+    </div>
+    <div class="label">העברת כסף לילד</div>
+  </div>
+
+  <!-- SCREEN 4: Settings -->
+  <div>
+    <div class="phone">
+      <div class="screen settings-screen">
+        <div class="status" style="background:#065f46; color:rgba(255,255,255,0.6);">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="hdr-green">
+          <div class="hdr-title">⚙️ הגדרות</div>
+          <div class="hdr-sub">ריבית וקוד הורה</div>
+        </div>
+
+        <div class="scroll-body">
+          <!-- Interest rate -->
+          <div class="settings-card">
+            <div class="settings-title">📈 ריבית שנתית גלובלית</div>
+            <div style="font-size:8px; color:#888; margin-bottom:8px;">חלה על פיקדונות של כל הילדים</div>
+            <div class="rate-row">
+              <input class="rate-inp" value="12" />
+              <span class="rate-unit">% לשנה</span>
+              <button class="rate-save">שמור</button>
+            </div>
+            <div class="divider"></div>
+            <div class="settings-title" style="margin-bottom:4px;">ריבית נוכחית לפי ילד</div>
+            <div class="kids-interest">
+              <div class="ki-row"><span class="ki-name">בר</span><span class="ki-rate">12%</span></div>
+              <div class="ki-row"><span class="ki-name">גל</span><span class="ki-rate">12%</span></div>
+            </div>
+          </div>
+
+          <!-- PIN -->
+          <div class="settings-card" style="margin-top:8px;">
+            <div class="settings-title">🔒 קוד הורה (4 ספרות)</div>
+            <div style="font-size:8px; color:#888; margin-bottom:8px;">נדרש לכניסה למסך הורים</div>
+            <div class="pin-row">
+              <div class="pin-label">קוד נוכחי</div>
+              <div class="pin-dots">
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+              </div>
+              <button class="pin-change">שנה קוד</button>
+            </div>
+            <div class="divider"></div>
+            <div class="pin-entry">
+              <div class="pin-hint">הזן קוד חדש:</div>
+              <div class="pin-inputs">
+                <input class="pin-inp filled" maxlength="1" value="•" />
+                <input class="pin-inp filled" maxlength="1" value="•" />
+                <input class="pin-inp" maxlength="1" placeholder="–" />
+                <input class="pin-inp" maxlength="1" placeholder="–" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav">
+          <button class="nav-item"><div class="nav-icon">👨‍👩‍👧‍👦</div>ילדים</button>
+          <button class="nav-item"><div class="nav-icon">💸</div>העברה</button>
+          <button class="nav-item active"><div class="nav-icon">⚙️</div>הגדרות</button>
+        </div>
+      </div>
+    </div>
+    <div class="label">הגדרות הורה</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -92,29 +92,37 @@ public class Dtos {
         public BigDecimal amount;
         public String description;
         public Transaction.Category category;
+        public boolean voided;
+        public Long voidedBy;
         public LocalDateTime createdAt;
 
         public TransactionResponse() {}
-        public TransactionResponse(Long id, Transaction.Type type, BigDecimal amount, String description, Transaction.Category category, LocalDateTime createdAt) {
-            this.id = id; this.type = type; this.amount = amount; this.description = description; this.category = category; this.createdAt = createdAt;
+        public TransactionResponse(Long id, Transaction.Type type, BigDecimal amount, String description, Transaction.Category category, boolean voided, Long voidedBy, LocalDateTime createdAt) {
+            this.id = id; this.type = type; this.amount = amount; this.description = description;
+            this.category = category; this.voided = voided; this.voidedBy = voidedBy; this.createdAt = createdAt;
         }
         public static Builder builder() { return new Builder(); }
         public static class Builder {
             private Long id; private Transaction.Type type; private BigDecimal amount;
-            private String description; private Transaction.Category category; private LocalDateTime createdAt;
+            private String description; private Transaction.Category category;
+            private boolean voided; private Long voidedBy; private LocalDateTime createdAt;
             public Builder id(Long id) { this.id = id; return this; }
             public Builder type(Transaction.Type t) { this.type = t; return this; }
             public Builder amount(BigDecimal a) { this.amount = a; return this; }
             public Builder description(String d) { this.description = d; return this; }
             public Builder category(Transaction.Category c) { this.category = c; return this; }
+            public Builder voided(boolean v) { this.voided = v; return this; }
+            public Builder voidedBy(Long id) { this.voidedBy = id; return this; }
             public Builder createdAt(LocalDateTime t) { this.createdAt = t; return this; }
-            public TransactionResponse build() { return new TransactionResponse(id, type, amount, description, category, createdAt); }
+            public TransactionResponse build() { return new TransactionResponse(id, type, amount, description, category, voided, voidedBy, createdAt); }
         }
         public Long getId() { return id; }
         public Transaction.Type getType() { return type; }
         public BigDecimal getAmount() { return amount; }
         public String getDescription() { return description; }
         public Transaction.Category getCategory() { return category; }
+        public boolean isVoided() { return voided; }
+        public Long getVoidedBy() { return voidedBy; }
         public LocalDateTime getCreatedAt() { return createdAt; }
     }
 
@@ -174,6 +182,31 @@ public class Dtos {
         public InterestRateRequest(BigDecimal interestRate) { this.interestRate = interestRate; }
         public BigDecimal getInterestRate() { return interestRate; }
         public void setInterestRate(BigDecimal r) { this.interestRate = r; }
+    }
+
+    // ── App Settings ──────────────────────────────────────
+    public static class InterestRateUpdateRequest {
+        @NotNull @DecimalMin("0.0") @DecimalMax("1.0") public BigDecimal globalInterestRate;
+
+        public InterestRateUpdateRequest() {}
+        public BigDecimal getGlobalInterestRate() { return globalInterestRate; }
+        public void setGlobalInterestRate(BigDecimal r) { this.globalInterestRate = r; }
+    }
+
+    public static class PinRequest {
+        @NotNull public String pin;
+
+        public PinRequest() {}
+        public String getPin() { return pin; }
+        public void setPin(String p) { this.pin = p; }
+    }
+
+    public static class SettingsResponse {
+        public BigDecimal globalInterestRate;
+
+        public SettingsResponse() {}
+        public SettingsResponse(BigDecimal globalInterestRate) { this.globalInterestRate = globalInterestRate; }
+        public BigDecimal getGlobalInterestRate() { return globalInterestRate; }
     }
 
     public static class SummaryResponse {
