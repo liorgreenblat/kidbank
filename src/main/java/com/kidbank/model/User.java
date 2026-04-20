@@ -23,7 +23,7 @@ public class User {
     private BigDecimal checkingBalance = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'KID'")
     private Role role = Role.KID;
 
     public User() {}

@@ -44,7 +44,7 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean voided = false;
 
     @Column
