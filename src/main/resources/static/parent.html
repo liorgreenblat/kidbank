@@ -516,7 +516,8 @@ async function voidTx(kidId, txId) {
 }
 
 // ── Transfer ──────────────────────────────────────────────
-function loadTransferTabs() {
+async function loadTransferTabs() {
+  if (!state.kids.length) state.kids = await api('/api/users');
   const el = document.getElementById('transfer-tabs');
   el.innerHTML = state.kids.map((k, i) => `
     <button class="kid-tab ${i === 0 ? 'active' : ''}" onclick="selectKidTab(this, ${k.id})">${k.name}</button>
