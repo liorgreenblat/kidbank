@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>KidBank — הורים 👨‍👩‍👧‍👦</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0fdf4; min-height: 100vh; direction: rtl; }
+
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── Login / PIN ── */
+#login { align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(160deg, #065f46 0%, #059669 100%); }
+.login-box { background: white; border-radius: 24px; padding: 2rem; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 60px rgba(6,95,70,0.3); }
+.login-logo { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.login-title { font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 0.25rem; }
+.login-sub { font-size: 0.82rem; color: #888; margin-bottom: 1.5rem; }
+.login-field { margin-bottom: 1rem; }
+.login-field input { width: 100%; border: 1.5px solid #d1fae5; border-radius: 12px; padding: 0.75rem 1rem; font-size: 1rem; text-align: right; outline: none; }
+.login-field input:focus { border-color: #059669; }
+.login-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 12px; padding: 0.85rem; font-size: 1rem; font-weight: 600; cursor: pointer; }
+.login-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; }
+
+/* PIN pad */
+#pin-screen { align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(160deg, #065f46 0%, #059669 100%); }
+.pin-box { background: white; border-radius: 24px; padding: 2rem 1.5rem; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(6,95,70,0.3); }
+.pin-title { font-size: 1.2rem; font-weight: 700; color: #065f46; margin-bottom: 0.3rem; }
+.pin-sub { font-size: 0.8rem; color: #888; margin-bottom: 1.5rem; }
+.pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 1.5rem; }
+.pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #d1fae5; background: transparent; transition: background 0.15s; }
+.pin-dot.filled { background: #059669; border-color: #059669; }
+.pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pin-key { background: #f0fdf4; border: 1.5px solid #d1fae5; border-radius: 14px; padding: 1rem 0; font-size: 1.4rem; font-weight: 600; color: #065f46; cursor: pointer; user-select: none; }
+.pin-key:active { background: #d1fae5; }
+.pin-key.del { font-size: 1rem; color: #dc2626; border-color: #fee2e2; background: #fff; }
+.pin-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; }
+
+/* ── App shell ── */
+.app-screen { background: #f0fdf4; display: flex; flex-direction: column; min-height: 100vh; }
+.hdr { background: #065f46; color: white; padding: 1rem 1.25rem 1.1rem; flex-shrink: 0; }
+.hdr-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.hdr-title { font-size: 1.1rem; font-weight: 700; }
+.hdr-sub { font-size: 0.75rem; opacity: 0.7; margin-top: 1px; }
+.logout-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 0.75rem; cursor: pointer; }
+.back-btn { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 0.8rem; cursor: pointer; padding: 0; margin-bottom: 4px; display: block; }
+
+.scroll-body { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
+.scroll-body::-webkit-scrollbar { width: 0; }
+
+/* ── Nav ── */
+.nav { display: flex; background: white; border-top: 0.5px solid #e5e7eb; position: sticky; bottom: 0; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 10px; font-size: 0.62rem; color: #aaa; cursor: pointer; border: none; background: none; }
+.nav-item.active { color: #059669; }
+.nav-icon { font-size: 1.2rem; }
+
+/* ── Kids overview ── */
+.kid-card { margin: 0.6rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1rem; cursor: pointer; }
+.kid-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.kid-name { font-size: 1rem; font-weight: 700; color: #065f46; }
+.kid-badge { font-size: 0.65rem; background: #d1fae5; color: #065f46; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+.kid-total { font-size: 1.4rem; font-weight: 700; color: #111; margin-bottom: 5px; }
+.kid-breakdown { display: flex; gap: 8px; margin-bottom: 0.6rem; }
+.kbi { flex: 1; background: #f0fdf4; border-radius: 8px; padding: 4px 6px; text-align: center; }
+.kbi-lbl { font-size: 0.62rem; color: #888; }
+.kbi-val { font-size: 0.82rem; font-weight: 600; color: #065f46; }
+.transfer-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 10px; padding: 0.5rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+.transfer-btn:active { background: #047857; }
+
+/* ── Kid detail ── */
+.detail-bal { background: #065f46; color: white; padding: 0.6rem 1.25rem 1rem; flex-shrink: 0; }
+.detail-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; }
+.detail-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 3px 0; }
+.detail-row + .detail-row { border-top: 0.5px solid rgba(255,255,255,0.2); }
+.detail-row.total { font-weight: 700; font-size: 0.9rem; }
+
+.sec-title { font-size: 0.78rem; font-weight: 600; color: #555; padding: 0.6rem 1rem 0.3rem; }
+.tx-list { padding: 0 1rem; }
+.tx-row { display: flex; align-items: center; gap: 0.55rem; padding: 0.5rem 0; border-bottom: 0.5px solid #ecfdf5; }
+.tx-row:last-child { border-bottom: none; }
+.tx-row.voided { opacity: 0.4; }
+.tx-ico { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; background: #f0fdf4; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-name { font-size: 0.78rem; font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-name.struck { text-decoration: line-through; color: #bbb; }
+.tx-date { font-size: 0.62rem; color: #aaa; margin-top: 1px; }
+.tx-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.tx-amt { font-size: 0.82rem; font-weight: 700; }
+.plus { color: #059669; } .minus { color: #dc2626; }
+.voided-tag { font-size: 0.58rem; background: #fee2e2; color: #dc2626; padding: 1px 5px; border-radius: 99px; font-weight: 600; }
+.void-btn { font-size: 0.65rem; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; padding: 2px 6px; cursor: pointer; }
+.void-btn:active { background: #fecaca; }
+.empty-state { text-align: center; color: #aaa; font-size: 0.85rem; padding: 2rem 1rem; }
+
+/* ── Transfer ── */
+.kid-tabs { display: flex; gap: 8px; padding: 0.7rem 1rem 0; }
+.kid-tab { flex: 1; background: white; border: 1.5px solid #d1fae5; border-radius: 10px; padding: 0.45rem 0; font-size: 0.85rem; font-weight: 600; color: #888; text-align: center; cursor: pointer; border: none; }
+.kid-tab.active { background: #059669; color: white; }
+.form-card { margin: 0.7rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1rem; }
+.form-lbl { font-size: 0.72rem; color: #888; margin-bottom: 3px; font-weight: 500; }
+.form-input { width: 100%; border: 1px solid #d1fae5; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.9rem; text-align: right; direction: rtl; color: #333; margin-bottom: 0.7rem; background: #f0fdf4; outline: none; }
+.cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 0.7rem; }
+.cat-btn { background: #f0fdf4; border: 1px solid #d1fae5; border-radius: 8px; padding: 0.45rem; font-size: 0.75rem; color: #555; cursor: pointer; text-align: center; }
+.cat-btn.active { background: #059669; color: white; border-color: #059669; }
+.confirm-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 12px; padding: 0.75rem; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+.confirm-btn:active { background: #047857; }
+.tx-msg { font-size: 0.75rem; min-height: 1.2em; margin-top: 0.4rem; text-align: center; }
+.tx-msg.ok { color: #059669; } .tx-msg.err { color: #dc2626; }
+
+/* ── Settings ── */
+.settings-card { margin: 0.7rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1rem; }
+.settings-title { font-size: 0.82rem; font-weight: 700; color: #065f46; margin-bottom: 6px; }
+.settings-hint { font-size: 0.7rem; color: #888; margin-bottom: 0.6rem; }
+.rate-row { display: flex; align-items: center; gap: 8px; }
+.rate-inp { flex: 1; border: 1px solid #d1fae5; border-radius: 10px; padding: 0.5rem; font-size: 1.2rem; font-weight: 700; color: #059669; text-align: center; background: #f0fdf4; outline: none; }
+.rate-unit { font-size: 0.8rem; color: #888; }
+.rate-save { background: #059669; color: white; border: none; border-radius: 10px; padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+.divider { height: 0.5px; background: #d1fae5; margin: 0.7rem 0; }
+.settings-msg { font-size: 0.75rem; min-height: 1.2em; margin-top: 0.3rem; }
+.settings-msg.ok { color: #059669; } .settings-msg.err { color: #dc2626; }
+
+.pin-change-row { display: flex; justify-content: space-between; align-items: center; }
+.pin-status { font-size: 0.8rem; color: #333; }
+.pin-change-btn { font-size: 0.75rem; color: #059669; background: none; border: none; cursor: pointer; font-weight: 600; }
+.new-pin-section { margin-top: 0.6rem; }
+.new-pin-dots { display: flex; gap: 8px; margin-bottom: 0.5rem; }
+.new-pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #d1fae5; }
+.new-pin-dot.filled { background: #059669; border-color: #059669; }
+.pin-mini-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pin-mini-key { background: #f0fdf4; border: 1px solid #d1fae5; border-radius: 10px; padding: 0.6rem 0; font-size: 1rem; font-weight: 600; color: #065f46; cursor: pointer; text-align: center; }
+.pin-mini-key:active { background: #d1fae5; }
+.pin-mini-key.del { font-size: 0.8rem; color: #dc2626; }
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login" class="screen active">
+  <div class="login-box">
+    <div class="login-logo">👨‍👩‍👧‍👦</div>
+    <div class="login-title">KidBank — הורים</div>
+    <div class="login-sub">כניסה להורים</div>
+    <div class="login-field">
+      <input id="inp-username" type="text" placeholder="שם משתמש (hadas / lior)" autocomplete="username" />
+    </div>
+    <button class="login-btn" onclick="handleLogin()">כניסה</button>
+    <div id="login-error" class="login-error"></div>
+    <div style="margin-top:1rem; font-size:0.75rem; color:#aaa;">
+      <a href="/" style="color:#059669;">← חזרה לאפליקציית ילדים</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PIN SCREEN ══ -->
+<div id="pin-screen" class="screen">
+  <div class="pin-box">
+    <div class="login-logo">🔒</div>
+    <div class="pin-title">קוד הורה</div>
+    <div class="pin-sub">הזן קוד 4 ספרות</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <div></div>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div id="pin-error" class="pin-error"></div>
+  </div>
+</div>
+
+<!-- ══ KIDS OVERVIEW ══ -->
+<div id="kids-overview" class="screen app-screen">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-title">👨‍👩‍👧‍👦 הילדים שלי</div></div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+  </div>
+  <div class="scroll-body" id="kids-list"><div style="text-align:center;padding:2rem;color:#aaa;font-size:.85rem;">טוען...</div></div>
+  <nav class="nav">
+    <button class="nav-item active" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+  </nav>
+</div>
+
+<!-- ══ KID DETAIL ══ -->
+<div id="kid-detail" class="screen app-screen">
+  <div class="hdr">
+    <button class="back-btn" onclick="showApp('kids-overview')">← חזרה</button>
+    <div class="hdr-row">
+      <div><div class="hdr-title" id="detail-name">—</div></div>
+    </div>
+  </div>
+  <div class="detail-bal" id="detail-bal-section">
+    <div class="detail-row"><span>עו"ש</span><span id="detail-checking">—</span></div>
+    <div class="detail-row"><span>פיקדון</span><span id="detail-deposit">—</span></div>
+    <div class="detail-row total"><span>סה"כ</span><span id="detail-total">—</span></div>
+  </div>
+  <div class="scroll-body">
+    <div class="sec-title">📋 כל התנועות</div>
+    <div class="tx-list" id="detail-tx-list"><div style="text-align:center;padding:2rem;color:#aaa;font-size:.85rem;">טוען...</div></div>
+  </div>
+  <nav class="nav">
+    <button class="nav-item" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+  </nav>
+</div>
+
+<!-- ══ TRANSFER ══ -->
+<div id="transfer" class="screen app-screen">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-title">💸 העבר כסף</div><div class="hdr-sub">הפקד ישירות לחשבון הילד</div></div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+  </div>
+  <div class="scroll-body">
+    <div style="padding:0.7rem 1rem 0;">
+      <div class="form-lbl">בחר ילד/ה</div>
+      <div class="kid-tabs" id="transfer-tabs"></div>
+    </div>
+    <div class="form-card">
+      <div class="form-lbl">סכום (₪)</div>
+      <input class="form-input" id="transfer-amount" type="number" min="0" placeholder="כמה ₪?" style="font-size:1.3rem;font-weight:700;color:#059669;" />
+      <div class="form-lbl">סיבה</div>
+      <div class="cat-grid" id="transfer-cats">
+        <div class="cat-btn active" data-cat="ALLOWANCE" onclick="selectCat(this)">⭐ דמי כיס</div>
+        <div class="cat-btn" data-cat="GIFT" onclick="selectCat(this)">🎁 מתנה</div>
+        <div class="cat-btn" data-cat="BIRTHDAY" onclick="selectCat(this)">🎂 יום הולדת</div>
+        <div class="cat-btn" data-cat="OTHER" onclick="selectCat(this)">💰 אחר</div>
+      </div>
+      <div class="form-lbl">הערה (אופציונלי)</div>
+      <input class="form-input" id="transfer-note" placeholder="לדוגמה: דמי כיס לשבוע זה" />
+      <button class="confirm-btn" id="transfer-btn" onclick="handleTransfer()">✓ העבר</button>
+      <div class="tx-msg" id="transfer-msg"></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-item" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item active" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+  </nav>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div id="settings" class="screen app-screen">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-title">⚙️ הגדרות</div></div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+  </div>
+  <div class="scroll-body">
+    <div class="settings-card">
+      <div class="settings-title">📈 ריבית שנתית גלובלית</div>
+      <div class="settings-hint">חלה על פיקדונות של כל הילדים</div>
+      <div class="rate-row">
+        <input class="rate-inp" id="rate-inp" type="number" min="0" max="100" step="1" value="12" />
+        <span class="rate-unit">% לשנה</span>
+        <button class="rate-save" onclick="saveRate()">שמור</button>
+      </div>
+      <div class="settings-msg" id="rate-msg"></div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-title">🔒 קוד הורה</div>
+      <div class="settings-hint">4 ספרות — נדרש בכניסה</div>
+      <div class="pin-change-row">
+        <span class="pin-status">●●●●</span>
+        <button class="pin-change-btn" onclick="togglePinChange()">שנה קוד</button>
+      </div>
+      <div id="new-pin-section" style="display:none;" class="new-pin-section">
+        <div class="divider"></div>
+        <div class="form-lbl">קוד חדש:</div>
+        <div class="new-pin-dots" id="new-pin-dots">
+          <div class="new-pin-dot" id="npd0"></div>
+          <div class="new-pin-dot" id="npd1"></div>
+          <div class="new-pin-dot" id="npd2"></div>
+          <div class="new-pin-dot" id="npd3"></div>
+        </div>
+        <div class="pin-mini-pad">
+          <button class="pin-mini-key" onclick="newPinPress('1')">1</button>
+          <button class="pin-mini-key" onclick="newPinPress('2')">2</button>
+          <button class="pin-mini-key" onclick="newPinPress('3')">3</button>
+          <button class="pin-mini-key" onclick="newPinPress('4')">4</button>
+          <button class="pin-mini-key" onclick="newPinPress('5')">5</button>
+          <button class="pin-mini-key" onclick="newPinPress('6')">6</button>
+          <button class="pin-mini-key" onclick="newPinPress('7')">7</button>
+          <button class="pin-mini-key" onclick="newPinPress('8')">8</button>
+          <button class="pin-mini-key" onclick="newPinPress('9')">9</button>
+          <div></div>
+          <button class="pin-mini-key" onclick="newPinPress('0')">0</button>
+          <button class="pin-mini-key del" onclick="newPinDel()">⌫</button>
+        </div>
+        <div class="settings-msg" id="pin-msg"></div>
+      </div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-item" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item active" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+  </nav>
+</div>
+
+<script>
+const API = '';
+
+const state = {
+  userId: null,
+  kids: [],
+  selectedKidId: null,
+  selectedCat: 'ALLOWANCE',
+  pinBuffer: '',
+  newPinBuffer: '',
+};
+
+const CATEGORY_EMOJI = {
+  ALLOWANCE:'⭐', BIRTHDAY:'🎂', GIFT:'🎁',
+  FOOD:'🍕', ENTERTAINMENT:'🎮', BOOKS:'📚',
+  TOYS:'🧸', SAVINGS:'🏦', OTHER:'💰',
+};
+const TYPE_EMOJI = { INCOME:'💵', EXPENSE:'🛍️', DEPOSIT_IN:'🏦', DEPOSIT_OUT:'🏦' };
+
+const fmt = n => '₪ ' + Number(n).toFixed(2);
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'היום, ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  if (diff === 1) return 'אתמול, ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  if (diff < 7) return `לפני ${diff} ימים`;
+  return d.toLocaleDateString('he-IL');
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.title || 'שגיאה');
+  }
+  if (res.status === 204) return null;
+  return res.json().catch(() => null);
+}
+
+// ── Screen control ───────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showApp(id) {
+  showScreen(id);
+  if (id === 'kids-overview') loadKids();
+  if (id === 'transfer') loadTransferTabs();
+  if (id === 'settings') loadSettings();
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const map = { 'kids-overview': 0, 'transfer': 1, 'settings': 2 };
+  document.querySelectorAll(`#${id} .nav-item`)[map[id]]?.classList.add('active');
+}
+
+// ── Login ─────────────────────────────────────────────────
+async function handleLogin() {
+  const username = document.getElementById('inp-username').value.trim();
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!username) { errEl.textContent = 'נא להזין שם משתמש'; return; }
+  try {
+    const user = await api(`/api/users/by-username?username=${encodeURIComponent(username)}`);
+    if (user.role !== 'PARENT') { errEl.textContent = '❌ משתמש זה אינו הורה'; return; }
+    state.userId = user.id;
+    state.pinBuffer = '';
+    updatePinDots('pd', '');
+    showScreen('pin-screen');
+  } catch (e) {
+    errEl.textContent = '❌ שם משתמש לא קיים';
+  }
+}
+
+// ── PIN flow ──────────────────────────────────────────────
+function updatePinDots(prefix, buf) {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById(prefix + i).classList.toggle('filled', i < buf.length);
+  }
+}
+
+function pinPress(d) {
+  if (state.pinBuffer.length >= 4) return;
+  state.pinBuffer += d;
+  updatePinDots('pd', state.pinBuffer);
+  if (state.pinBuffer.length === 4) verifyPin();
+}
+
+function pinDel() {
+  state.pinBuffer = state.pinBuffer.slice(0, -1);
+  updatePinDots('pd', state.pinBuffer);
+  document.getElementById('pin-error').textContent = '';
+}
+
+async function verifyPin() {
+  try {
+    await api('/api/settings/verify-pin', { method: 'POST', body: JSON.stringify({ pin: state.pinBuffer }) });
+    showApp('kids-overview');
+  } catch (e) {
+    document.getElementById('pin-error').textContent = '❌ קוד שגוי, נסה שוב';
+    state.pinBuffer = '';
+    updatePinDots('pd', '');
+  }
+}
+
+function logout() {
+  state.userId = null;
+  state.pinBuffer = '';
+  document.getElementById('inp-username').value = '';
+  document.getElementById('login-error').textContent = '';
+  showScreen('login');
+}
+
+// ── Kids overview ─────────────────────────────────────────
+async function loadKids() {
+  try {
+    state.kids = await api('/api/users');
+    const el = document.getElementById('kids-list');
+    if (!state.kids.length) { el.innerHTML = '<div class="empty-state">אין ילדים רשומים</div>'; return; }
+    el.innerHTML = state.kids.map(k => `
+      <div class="kid-card" onclick="openKidDetail(${k.id})">
+        <div class="kid-card-top">
+          <div class="kid-name">${k.name} 🧒</div>
+          <div class="kid-badge">ילד/ה</div>
+        </div>
+        <div class="kid-total">${fmt(k.totalBalance)}</div>
+        <div class="kid-breakdown">
+          <div class="kbi"><div class="kbi-lbl">עו"ש</div><div class="kbi-val">${fmt(k.checkingBalance)}</div></div>
+          <div class="kbi"><div class="kbi-lbl">פיקדון</div><div class="kbi-val">${fmt(k.depositTotal)}</div></div>
+        </div>
+        <button class="transfer-btn" onclick="event.stopPropagation(); openTransferFor(${k.id})">💸 העבר כסף ל${k.name}</button>
+      </div>`).join('');
+  } catch (e) {
+    document.getElementById('kids-list').innerHTML = `<div class="empty-state">${e.message}</div>`;
+  }
+}
+
+// ── Kid detail ────────────────────────────────────────────
+async function openKidDetail(kidId) {
+  state.selectedKidId = kidId;
+  const kid = state.kids.find(k => k.id === kidId);
+  document.getElementById('detail-name').textContent = kid?.name + ' 🧒' || '—';
+  document.getElementById('detail-checking').textContent = fmt(kid?.checkingBalance || 0);
+  document.getElementById('detail-deposit').textContent  = fmt(kid?.depositTotal || 0);
+  document.getElementById('detail-total').textContent    = fmt(kid?.totalBalance || 0);
+  showScreen('kid-detail');
+  await loadKidTransactions(kidId);
+}
+
+async function loadKidTransactions(kidId) {
+  const el = document.getElementById('detail-tx-list');
+  try {
+    const txs = await api(`/api/users/${kidId}/transactions`);
+    if (!txs.length) { el.innerHTML = '<div class="empty-state">אין תנועות עדיין</div>'; return; }
+    el.innerHTML = txs.map(tx => {
+      const emoji = CATEGORY_EMOJI[tx.category] || TYPE_EMOJI[tx.type] || '💰';
+      const isPlus = tx.type === 'INCOME' || tx.type === 'DEPOSIT_OUT';
+      return `
+        <div class="tx-row ${tx.voided ? 'voided' : ''}">
+          <div class="tx-ico">${tx.voidedBy ? '↩️' : emoji}</div>
+          <div class="tx-info">
+            <div class="tx-name ${tx.voided ? 'struck' : ''}">${tx.description || tx.type}</div>
+            <div class="tx-date">${fmtDate(tx.createdAt)}</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amt ${isPlus ? 'plus' : 'minus'}" style="${tx.voided ? 'text-decoration:line-through' : ''}">
+              ${isPlus ? '+' : '-'}${fmt(tx.amount)}
+            </div>
+            ${tx.voided
+              ? '<div class="voided-tag">בוטל</div>'
+              : (tx.type === 'INCOME' || tx.type === 'EXPENSE')
+                ? `<button class="void-btn" onclick="voidTx(${kidId}, ${tx.id})">ביטול</button>`
+                : ''}
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state">${e.message}</div>`;
+  }
+}
+
+async function voidTx(kidId, txId) {
+  if (!confirm('לבטל את התנועה?')) return;
+  try {
+    await api(`/api/users/${kidId}/transactions/${txId}/void`, { method: 'POST' });
+    await loadKidTransactions(kidId);
+    await loadKids();
+    const kid = state.kids.find(k => k.id === kidId);
+    if (kid) {
+      document.getElementById('detail-checking').textContent = fmt(kid.checkingBalance);
+      document.getElementById('detail-total').textContent    = fmt(kid.totalBalance);
+    }
+  } catch (e) { alert(e.message); }
+}
+
+// ── Transfer ──────────────────────────────────────────────
+async function loadTransferTabs() {
+  if (!state.kids.length) state.kids = await api('/api/users');
+  const el = document.getElementById('transfer-tabs');
+  el.innerHTML = state.kids.map((k, i) => `
+    <button class="kid-tab ${i === 0 ? 'active' : ''}" onclick="selectKidTab(this, ${k.id})">${k.name}</button>
+  `).join('');
+  if (state.kids.length) state.selectedKidId = state.kids[0].id;
+}
+
+function openTransferFor(kidId) {
+  showApp('transfer');
+  state.selectedKidId = kidId;
+  document.querySelectorAll('.kid-tab').forEach((b, i) => {
+    b.classList.toggle('active', state.kids[i]?.id === kidId);
+  });
+}
+
+function selectKidTab(btn, kidId) {
+  document.querySelectorAll('.kid-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.selectedKidId = kidId;
+}
+
+function selectCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.selectedCat = btn.dataset.cat;
+}
+
+async function handleTransfer() {
+  const amount = parseFloat(document.getElementById('transfer-amount').value);
+  const note = document.getElementById('transfer-note').value.trim();
+  const msgEl = document.getElementById('transfer-msg');
+  msgEl.className = 'tx-msg';
+  if (!amount || amount <= 0) { msgEl.className = 'tx-msg err'; msgEl.textContent = 'נא להזין סכום תקין'; return; }
+  if (!state.selectedKidId) { msgEl.className = 'tx-msg err'; msgEl.textContent = 'נא לבחור ילד/ה'; return; }
+  const kid = state.kids.find(k => k.id === state.selectedKidId);
+  try {
+    await api(`/api/users/${state.selectedKidId}/transactions`, {
+      method: 'POST',
+      body: JSON.stringify({ type: 'INCOME', amount, description: note || null, category: state.selectedCat }),
+    });
+    msgEl.className = 'tx-msg ok';
+    msgEl.textContent = `✓ הועבר ₪${amount.toFixed(2)} ל${kid?.name}!`;
+    document.getElementById('transfer-amount').value = '';
+    document.getElementById('transfer-note').value = '';
+    await loadKids();
+  } catch (e) { msgEl.className = 'tx-msg err'; msgEl.textContent = e.message; }
+}
+
+// ── Settings ──────────────────────────────────────────────
+async function loadSettings() {
+  try {
+    const s = await api('/api/settings');
+    document.getElementById('rate-inp').value = (s.globalInterestRate * 100).toFixed(0);
+  } catch (e) {}
+}
+
+async function saveRate() {
+  const pct = parseFloat(document.getElementById('rate-inp').value);
+  const msgEl = document.getElementById('rate-msg');
+  msgEl.className = 'settings-msg';
+  if (isNaN(pct) || pct < 0 || pct > 100) { msgEl.className = 'settings-msg err'; msgEl.textContent = 'ריבית לא תקינה'; return; }
+  try {
+    await api('/api/settings/interest-rate', { method: 'PUT', body: JSON.stringify({ globalInterestRate: pct / 100 }) });
+    msgEl.className = 'settings-msg ok';
+    msgEl.textContent = `✓ ריבית עודכנה ל-${pct}% לכל הילדים`;
+  } catch (e) { msgEl.className = 'settings-msg err'; msgEl.textContent = e.message; }
+}
+
+function togglePinChange() {
+  const sec = document.getElementById('new-pin-section');
+  sec.style.display = sec.style.display === 'none' ? '' : 'none';
+  state.newPinBuffer = '';
+  updatePinDots('npd', '');
+  document.getElementById('pin-msg').textContent = '';
+}
+
+function newPinPress(d) {
+  if (state.newPinBuffer.length >= 4) return;
+  state.newPinBuffer += d;
+  updatePinDots('npd', state.newPinBuffer);
+  if (state.newPinBuffer.length === 4) saveNewPin();
+}
+
+function newPinDel() {
+  state.newPinBuffer = state.newPinBuffer.slice(0, -1);
+  updatePinDots('npd', state.newPinBuffer);
+}
+
+async function saveNewPin() {
+  const msgEl = document.getElementById('pin-msg');
+  try {
+    await api('/api/settings/parent-pin', { method: 'PUT', body: JSON.stringify({ pin: state.newPinBuffer }) });
+    msgEl.className = 'settings-msg ok';
+    msgEl.textContent = '✓ קוד עודכן בהצלחה';
+    state.newPinBuffer = '';
+    updatePinDots('npd', '');
+    setTimeout(() => togglePinChange(), 1200);
+  } catch (e) {
+    msgEl.className = 'settings-msg err';
+    msgEl.textContent = e.message;
+    state.newPinBuffer = '';
+    updatePinDots('npd', '');
+  }
+}
+
+// ── Enter key ─────────────────────────────────────────────
+document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+</body>
+</html>

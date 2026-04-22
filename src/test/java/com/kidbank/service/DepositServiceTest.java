@@ -1,6 +1,7 @@
 package com.kidbank.service;
 
 import com.kidbank.dto.Dtos.*;
+import com.kidbank.model.AppSettings;
 import com.kidbank.model.Deposit;
 import com.kidbank.model.User;
 import com.kidbank.repository.DepositRepository;
@@ -25,6 +26,7 @@ class DepositServiceTest {
     @Mock DepositRepository depositRepository;
     @Mock TransactionRepository transactionRepository;
     @Mock UserService userService;
+    @Mock AppSettingsService appSettingsService;
     @InjectMocks DepositService depositService;
 
     private User mockUser;
@@ -37,6 +39,8 @@ class DepositServiceTest {
         mockDeposit = Deposit.builder().id(1L).user(mockUser)
                 .totalAmount(new BigDecimal("80.00")).interestRate(new BigDecimal("0.12")).build();
         when(userService.findUser(1L)).thenReturn(mockUser);
+        AppSettings defaultSettings = new AppSettings();
+        lenient().when(appSettingsService.getOrCreate()).thenReturn(defaultSettings);
     }
 
     @Test

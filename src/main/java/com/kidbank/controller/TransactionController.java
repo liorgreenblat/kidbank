@@ -36,4 +36,9 @@ public class TransactionController {
                                       @RequestParam(required = false) String range) {
         return transactionService.getSummary(userId, range);
     }
+
+    @PostMapping("/{txId}/void")
+    public TransactionResponse voidTransaction(@PathVariable Long userId, @PathVariable Long txId) {
+        return transactionService.voidTransaction(userId, txId);
+    }
 }
