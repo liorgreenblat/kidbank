@@ -1,8 +1,8 @@
 [build]
-builder = "NIXPACKS"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "java -jar target/*.jar"
 healthcheckPath = "/api/users"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
