@@ -28,14 +28,16 @@ public class AppSettingsController {
     }
 
     @PostMapping("/verify-pin")
-    public void verifyPin(@RequestBody PinRequest req) {
+    public java.util.Map<String, Boolean> verifyPin(@RequestBody PinRequest req) {
         if (!appSettingsService.verifyPin(req.getPin())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid PIN");
         }
+        return java.util.Map.of("valid", true);
     }
 
     @PutMapping("/parent-pin")
-    public void updatePin(@RequestBody PinRequest req) {
+    public java.util.Map<String, Boolean> updatePin(@RequestBody PinRequest req) {
         appSettingsService.updatePin(req.getPin());
+        return java.util.Map.of("ok", true);
     }
 }
