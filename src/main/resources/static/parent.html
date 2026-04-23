@@ -12,7 +12,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .screen.active { display: flex; }
 
 /* ── App shell ── */
-.app-screen { background: #f0fdf4; display: flex; flex-direction: column; min-height: 100vh; }
+.app-screen { background: #f0fdf4; display: none; flex-direction: column; min-height: 100vh; }
+.app-screen.active { display: flex; }
 .hdr { background: #065f46; color: white; padding: 1rem 1.25rem 1.1rem; flex-shrink: 0; }
 .hdr-row { display: flex; justify-content: space-between; align-items: flex-start; }
 .hdr-title { font-size: 1.1rem; font-weight: 700; }
@@ -357,6 +358,7 @@ async function openKidDetail(kidId) {
 
 async function loadKidTransactions(kidId) {
   const el = document.getElementById('detail-tx-list');
+  const TYPE_LABELS = { INCOME: 'הכנסה', EXPENSE: 'הוצאה', DEPOSIT_IN: 'פיקדון - הפקדה', DEPOSIT_OUT: 'פיקדון - משיכה' };
   try {
     const txs = await api(`/api/users/${kidId}/transactions`);
     if (!txs.length) { el.innerHTML = '<div class="empty-state">אין תנועות עדיין</div>'; return; }
@@ -367,7 +369,7 @@ async function loadKidTransactions(kidId) {
         <div class="tx-row ${tx.voided ? 'voided' : ''}">
           <div class="tx-ico">${tx.voidedBy ? '↩️' : emoji}</div>
           <div class="tx-info">
-            <div class="tx-name ${tx.voided ? 'struck' : ''}">${tx.description || tx.type}</div>
+            <div class="tx-name ${tx.voided ? 'struck' : ''}">${tx.description || TYPE_LABELS[tx.type] || tx.type}</div>
             <div class="tx-date">${fmtDate(tx.createdAt)}</div>
           </div>
           <div class="tx-right">
