@@ -11,34 +11,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .screen { display: none; min-height: 100vh; flex-direction: column; }
 .screen.active { display: flex; }
 
-/* ── Login / PIN ── */
-#login { align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(160deg, #065f46 0%, #059669 100%); }
-.login-box { background: white; border-radius: 24px; padding: 2rem; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 60px rgba(6,95,70,0.3); }
-.login-logo { font-size: 2.5rem; margin-bottom: 0.5rem; }
-.login-title { font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 0.25rem; }
-.login-sub { font-size: 0.82rem; color: #888; margin-bottom: 1.5rem; }
-.login-field { margin-bottom: 1rem; }
-.login-field input { width: 100%; border: 1.5px solid #d1fae5; border-radius: 12px; padding: 0.75rem 1rem; font-size: 1rem; text-align: right; outline: none; }
-.login-field input:focus { border-color: #059669; }
-.login-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 12px; padding: 0.85rem; font-size: 1rem; font-weight: 600; cursor: pointer; }
-.login-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; }
-
-/* PIN pad */
-#pin-screen { align-items: center; justify-content: center; padding: 2rem; background: linear-gradient(160deg, #065f46 0%, #059669 100%); }
-.pin-box { background: white; border-radius: 24px; padding: 2rem 1.5rem; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(6,95,70,0.3); }
-.pin-title { font-size: 1.2rem; font-weight: 700; color: #065f46; margin-bottom: 0.3rem; }
-.pin-sub { font-size: 0.8rem; color: #888; margin-bottom: 1.5rem; }
-.pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 1.5rem; }
-.pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #d1fae5; background: transparent; transition: background 0.15s; }
-.pin-dot.filled { background: #059669; border-color: #059669; }
-.pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.pin-key { background: #f0fdf4; border: 1.5px solid #d1fae5; border-radius: 14px; padding: 1rem 0; font-size: 1.4rem; font-weight: 600; color: #065f46; cursor: pointer; user-select: none; }
-.pin-key:active { background: #d1fae5; }
-.pin-key.del { font-size: 1rem; color: #dc2626; border-color: #fee2e2; background: #fff; }
-.pin-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; }
-
 /* ── App shell ── */
-.app-screen { background: #f0fdf4; display: flex; flex-direction: column; min-height: 100vh; }
+.app-screen { background: #f0fdf4; display: none; flex-direction: column; min-height: 100vh; }
+.app-screen.active { display: flex; }
 .hdr { background: #065f46; color: white; padding: 1rem 1.25rem 1.1rem; flex-shrink: 0; }
 .hdr-row { display: flex; justify-content: space-between; align-items: flex-start; }
 .hdr-title { font-size: 1.1rem; font-weight: 700; }
@@ -46,7 +21,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .logout-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 0.75rem; cursor: pointer; }
 .back-btn { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 0.8rem; cursor: pointer; padding: 0; margin-bottom: 4px; display: block; }
 
-.scroll-body { flex: 1; overflow-y: auto; padding-bottom: 5rem; }
+.scroll-body { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
 .scroll-body::-webkit-scrollbar { width: 0; }
 
 /* ── Nav ── */
@@ -105,9 +80,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .cat-btn.active { background: #059669; color: white; border-color: #059669; }
 .confirm-btn { width: 100%; background: #059669; color: white; border: none; border-radius: 12px; padding: 0.75rem; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
 .confirm-btn:active { background: #047857; }
-.tx-msg { font-size: 0.85rem; font-weight: 600; min-height: 1.2em; margin-top: 0.75rem; text-align: center; padding: 0.6rem; border-radius: 10px; display: none; }
-.tx-msg.ok { color: #065f46; background: #d1fae5; display: block; }
-.tx-msg.err { color: #991b1b; background: #fee2e2; display: block; }
+.tx-msg { font-size: 0.75rem; min-height: 1.2em; margin-top: 0.4rem; text-align: center; }
+.tx-msg.ok { color: #059669; } .tx-msg.err { color: #dc2626; }
 
 /* ── Settings ── */
 .settings-card { margin: 0.7rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1rem; }
@@ -135,53 +109,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </style>
 </head>
 <body>
-
-<!-- ══ LOGIN ══ -->
-<div id="login" class="screen active">
-  <div class="login-box">
-    <div class="login-logo">👨‍👩‍👧‍👦</div>
-    <div class="login-title">KidBank — הורים</div>
-    <div class="login-sub">כניסה להורים</div>
-    <div class="login-field">
-      <input id="inp-username" type="text" placeholder="שם משתמש (hadas / lior)" autocomplete="username" />
-    </div>
-    <button class="login-btn" id="login-btn">כניסה</button>
-    <div id="login-error" class="login-error"></div>
-    <div style="margin-top:1rem; font-size:0.75rem; color:#aaa;">
-      <a href="/" style="color:#059669;">← חזרה לאפליקציית ילדים</a>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PIN SCREEN ══ -->
-<div id="pin-screen" class="screen">
-  <div class="pin-box">
-    <div class="login-logo">🔒</div>
-    <div class="pin-title">קוד הורה</div>
-    <div class="pin-sub">הזן קוד 4 ספרות</div>
-    <div class="pin-dots" id="pin-dots">
-      <div class="pin-dot" id="pd0"></div>
-      <div class="pin-dot" id="pd1"></div>
-      <div class="pin-dot" id="pd2"></div>
-      <div class="pin-dot" id="pd3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-key" data-digit="1">1</button>
-      <button class="pin-key" data-digit="2">2</button>
-      <button class="pin-key" data-digit="3">3</button>
-      <button class="pin-key" data-digit="4">4</button>
-      <button class="pin-key" data-digit="5">5</button>
-      <button class="pin-key" data-digit="6">6</button>
-      <button class="pin-key" data-digit="7">7</button>
-      <button class="pin-key" data-digit="8">8</button>
-      <button class="pin-key" data-digit="9">9</button>
-      <div></div>
-      <button class="pin-key" data-digit="0">0</button>
-      <button class="pin-key del" id="pin-del">⌫</button>
-    </div>
-    <div id="pin-error" class="pin-error"></div>
-  </div>
-</div>
 
 <!-- ══ KIDS OVERVIEW ══ -->
 <div id="kids-overview" class="screen app-screen">
@@ -328,7 +255,6 @@ const state = {
   kids: [],
   selectedKidId: null,
   selectedCat: 'ALLOWANCE',
-  pinBuffer: '',
   newPinBuffer: '',
 };
 
@@ -355,7 +281,7 @@ async function api(path, opts = {}) {
   const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.detail || body.message || body.title || 'שגיאה');
+    throw new Error(body.detail || body.title || 'שגיאה');
   }
   if (res.status === 204) return null;
   return res.json().catch(() => null);
@@ -374,23 +300,24 @@ function showApp(id) {
   if (id === 'settings') loadSettings();
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   const map = { 'kids-overview': 0, 'transfer': 1, 'settings': 2 };
-  document.querySelectorAll(`#${id} .nav-item`)[map[id]]?.classList.add('active');
+  const navBtns = document.querySelectorAll(`#${id} .nav-item`);
+  if (navBtns[map[id]]) navBtns[map[id]].classList.add('active');
 }
 
-// ── Auto-login as lior on page load ───────────────────────
+function logout() {
+  state.userId = null;
+  autoLogin();
+}
+
+// ── Auto-login ────────────────────────────────────────────
 async function autoLogin() {
   try {
     const user = await api('/api/users/by-username?username=lior');
     state.userId = user.id;
     showApp('kids-overview');
   } catch (e) {
-    document.body.innerHTML = '<div style="padding:2rem;color:red;">שגיאה בטעינה: ' + e.message + '</div>';
+    document.body.innerHTML = '<div style="padding:2rem;color:red;text-align:center;">שגיאה בטעינה: ' + e.message + '</div>';
   }
-}
-
-function logout() {
-  state.userId = null;
-  autoLogin();
 }
 
 // ── Kids overview ─────────────────────────────────────────
@@ -421,7 +348,7 @@ async function loadKids() {
 async function openKidDetail(kidId) {
   state.selectedKidId = kidId;
   const kid = state.kids.find(k => k.id === kidId);
-  document.getElementById('detail-name').textContent = kid?.name + ' 🧒' || '—';
+  document.getElementById('detail-name').textContent = (kid?.name || '—') + ' 🧒';
   document.getElementById('detail-checking').textContent = fmt(kid?.checkingBalance || 0);
   document.getElementById('detail-deposit').textContent  = fmt(kid?.depositTotal || 0);
   document.getElementById('detail-total').textContent    = fmt(kid?.totalBalance || 0);
@@ -431,6 +358,7 @@ async function openKidDetail(kidId) {
 
 async function loadKidTransactions(kidId) {
   const el = document.getElementById('detail-tx-list');
+  const TYPE_LABELS = { INCOME: 'הכנסה', EXPENSE: 'הוצאה', DEPOSIT_IN: 'הפקדה לחיסכון', DEPOSIT_OUT: 'משיכה מחיסכון' };
   try {
     const txs = await api(`/api/users/${kidId}/transactions`);
     if (!txs.length) { el.innerHTML = '<div class="empty-state">אין תנועות עדיין</div>'; return; }
@@ -441,7 +369,7 @@ async function loadKidTransactions(kidId) {
         <div class="tx-row ${tx.voided ? 'voided' : ''}">
           <div class="tx-ico">${tx.voidedBy ? '↩️' : emoji}</div>
           <div class="tx-info">
-            <div class="tx-name ${tx.voided ? 'struck' : ''}">${tx.description || tx.type}</div>
+            <div class="tx-name ${tx.voided ? 'struck' : ''}">${tx.description || TYPE_LABELS[tx.type] || tx.type}</div>
             <div class="tx-date">${fmtDate(tx.createdAt)}</div>
           </div>
           <div class="tx-right">
@@ -510,12 +438,9 @@ async function handleTransfer() {
   const note = document.getElementById('transfer-note').value.trim();
   const msgEl = document.getElementById('transfer-msg');
   msgEl.className = 'tx-msg';
-  msgEl.textContent = '';
-  if (!amount || amount <= 0) { msgEl.className = 'tx-msg err'; msgEl.textContent = 'נא להזין סכום תקין'; msgEl.scrollIntoView({behavior:'smooth'}); return; }
-  if (!state.selectedKidId) { msgEl.className = 'tx-msg err'; msgEl.textContent = 'נא לבחור ילד/ה'; msgEl.scrollIntoView({behavior:'smooth'}); return; }
+  if (!amount || amount <= 0) { msgEl.className = 'tx-msg err'; msgEl.textContent = 'נא להזין סכום תקין'; return; }
+  if (!state.selectedKidId) { msgEl.className = 'tx-msg err'; msgEl.textContent = 'נא לבחור ילד/ה'; return; }
   const kid = state.kids.find(k => k.id === state.selectedKidId);
-  const btn = document.getElementById('transfer-btn');
-  btn.disabled = true; btn.textContent = '...שולח';
   try {
     await api(`/api/users/${state.selectedKidId}/transactions`, {
       method: 'POST',
@@ -526,13 +451,7 @@ async function handleTransfer() {
     document.getElementById('transfer-amount').value = '';
     document.getElementById('transfer-note').value = '';
     await loadKids();
-  } catch (e) {
-    msgEl.className = 'tx-msg err';
-    msgEl.textContent = e.message || 'שגיאה בהעברה';
-  } finally {
-    btn.disabled = false; btn.textContent = '✓ העבר';
-    msgEl.scrollIntoView({ behavior: 'smooth' });
-  }
+  } catch (e) { msgEl.className = 'tx-msg err'; msgEl.textContent = e.message; }
 }
 
 // ── Settings ──────────────────────────────────────────────
@@ -561,6 +480,12 @@ function togglePinChange() {
   state.newPinBuffer = '';
   updatePinDots('npd', '');
   document.getElementById('pin-msg').textContent = '';
+}
+
+function updatePinDots(prefix, buf) {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById(prefix + i).classList.toggle('filled', i < buf.length);
+  }
 }
 
 function newPinPress(d) {
@@ -592,13 +517,9 @@ async function saveNewPin() {
   }
 }
 
-function updatePinDots(prefix, buf) {
-  for (let i = 0; i < 4; i++)
-    document.getElementById(prefix + i)?.classList.toggle('filled', i < buf.length);
-}
-
+// ── Wire up all static event listeners ───────────────────
 function setupEventListeners() {
-  // Nav buttons (data-nav="kids-overview" etc.)
+  // Nav buttons (all screens)
   document.querySelectorAll('[data-nav]').forEach(btn =>
     btn.addEventListener('click', () => showApp(btn.dataset.nav)));
 
@@ -606,21 +527,16 @@ function setupEventListeners() {
   document.querySelectorAll('[data-action="logout"]').forEach(btn =>
     btn.addEventListener('click', logout));
 
-  // Back button in kid-detail
-  document.querySelector('#kid-detail .back-btn')
-    ?.addEventListener('click', () => showApp('kids-overview'));
+  // Transfer confirm button
+  document.getElementById('transfer-btn').addEventListener('click', handleTransfer);
 
-  // Transfer confirm
-  document.getElementById('transfer-btn')
-    .addEventListener('click', handleTransfer);
-
-  // Category buttons — event delegation
+  // Category buttons (static, inside transfer form)
   document.getElementById('transfer-cats').addEventListener('click', e => {
     const btn = e.target.closest('.cat-btn');
     if (btn) selectCat(btn);
   });
 
-  // Kids list — delegation for card click and transfer button
+  // Kids list — delegate: transfer-for button and kid card
   document.getElementById('kids-list').addEventListener('click', e => {
     const transferBtn = e.target.closest('[data-transfer-for]');
     const kidCard     = e.target.closest('[data-kid-id]');
@@ -628,13 +544,13 @@ function setupEventListeners() {
     else if (kidCard) openKidDetail(+kidCard.dataset.kidId);
   });
 
-  // Transaction list — delegation for void buttons
+  // Transaction list — delegate void buttons
   document.getElementById('detail-tx-list').addEventListener('click', e => {
     const btn = e.target.closest('[data-void-tx]');
     if (btn) voidTx(+btn.dataset.voidKid, +btn.dataset.voidTx);
   });
 
-  // Transfer kid tabs — delegation
+  // Transfer kid tabs — delegate
   document.getElementById('transfer-tabs').addEventListener('click', e => {
     const btn = e.target.closest('[data-kid-tab]');
     if (btn) selectKidTab(btn, +btn.dataset.kidTab);
