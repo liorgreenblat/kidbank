@@ -377,61 +377,20 @@ function showApp(id) {
   document.querySelectorAll(`#${id} .nav-item`)[map[id]]?.classList.add('active');
 }
 
-// ── Login ─────────────────────────────────────────────────
-async function handleLogin() {
-  const username = document.getElementById('inp-username').value.trim();
-  const errEl = document.getElementById('login-error');
-  errEl.textContent = '';
-  if (!username) { errEl.textContent = 'נא להזין שם משתמש'; return; }
+// ── Auto-login as lior on page load ───────────────────────
+async function autoLogin() {
   try {
-    const user = await api(`/api/users/by-username?username=${encodeURIComponent(username)}`);
-    if (user.role !== 'PARENT') { errEl.textContent = '❌ משתמש זה אינו הורה'; return; }
+    const user = await api('/api/users/by-username?username=lior');
     state.userId = user.id;
-    state.pinBuffer = '';
-    updatePinDots('pd', '');
-    showScreen('pin-screen');
-  } catch (e) {
-    errEl.textContent = '❌ שם משתמש לא קיים';
-  }
-}
-
-// ── PIN flow ──────────────────────────────────────────────
-function updatePinDots(prefix, buf) {
-  for (let i = 0; i < 4; i++) {
-    document.getElementById(prefix + i).classList.toggle('filled', i < buf.length);
-  }
-}
-
-function pinPress(d) {
-  if (state.pinBuffer.length >= 4) return;
-  state.pinBuffer += d;
-  updatePinDots('pd', state.pinBuffer);
-  if (state.pinBuffer.length === 4) verifyPin();
-}
-
-function pinDel() {
-  state.pinBuffer = state.pinBuffer.slice(0, -1);
-  updatePinDots('pd', state.pinBuffer);
-  document.getElementById('pin-error').textContent = '';
-}
-
-async function verifyPin() {
-  try {
-    await api('/api/settings/verify-pin', { method: 'POST', body: JSON.stringify({ pin: state.pinBuffer }) });
     showApp('kids-overview');
   } catch (e) {
-    document.getElementById('pin-error').textContent = '❌ קוד שגוי, נסה שוב';
-    state.pinBuffer = '';
-    updatePinDots('pd', '');
+    document.body.innerHTML = '<div style="padding:2rem;color:red;">שגיאה בטעינה: ' + e.message + '</div>';
   }
 }
 
 function logout() {
   state.userId = null;
-  state.pinBuffer = '';
-  document.getElementById('inp-username').value = '';
-  document.getElementById('login-error').textContent = '';
-  showScreen('login');
+  autoLogin();
 }
 
 // ── Kids overview ─────────────────────────────────────────
@@ -633,8 +592,7 @@ async function saveNewPin() {
   }
 }
 
-// ── Enter key ─────────────────────────────────────────────
-document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+autoLogin();
 </script>
 </body>
 </html>
