@@ -145,7 +145,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="login-field">
       <input id="inp-username" type="text" placeholder="שם משתמש (hadas / lior)" autocomplete="username" />
     </div>
-    <button class="login-btn" onclick="handleLogin()">כניסה</button>
+    <button class="login-btn" id="login-btn">כניסה</button>
     <div id="login-error" class="login-error"></div>
     <div style="margin-top:1rem; font-size:0.75rem; color:#aaa;">
       <a href="/" style="color:#059669;">← חזרה לאפליקציית ילדים</a>
@@ -166,18 +166,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="pin-dot" id="pd3"></div>
     </div>
     <div class="pin-pad">
-      <button class="pin-key" onclick="pinPress('1')">1</button>
-      <button class="pin-key" onclick="pinPress('2')">2</button>
-      <button class="pin-key" onclick="pinPress('3')">3</button>
-      <button class="pin-key" onclick="pinPress('4')">4</button>
-      <button class="pin-key" onclick="pinPress('5')">5</button>
-      <button class="pin-key" onclick="pinPress('6')">6</button>
-      <button class="pin-key" onclick="pinPress('7')">7</button>
-      <button class="pin-key" onclick="pinPress('8')">8</button>
-      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" data-digit="1">1</button>
+      <button class="pin-key" data-digit="2">2</button>
+      <button class="pin-key" data-digit="3">3</button>
+      <button class="pin-key" data-digit="4">4</button>
+      <button class="pin-key" data-digit="5">5</button>
+      <button class="pin-key" data-digit="6">6</button>
+      <button class="pin-key" data-digit="7">7</button>
+      <button class="pin-key" data-digit="8">8</button>
+      <button class="pin-key" data-digit="9">9</button>
       <div></div>
-      <button class="pin-key" onclick="pinPress('0')">0</button>
-      <button class="pin-key del" onclick="pinDel()">⌫</button>
+      <button class="pin-key" data-digit="0">0</button>
+      <button class="pin-key del" id="pin-del">⌫</button>
     </div>
     <div id="pin-error" class="pin-error"></div>
   </div>
@@ -188,21 +188,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="hdr">
     <div class="hdr-row">
       <div><div class="hdr-title">👨‍👩‍👧‍👦 הילדים שלי</div></div>
-      <button class="logout-btn" onclick="logout()">יציאה</button>
+      <button class="logout-btn" data-action="logout">יציאה</button>
     </div>
   </div>
   <div class="scroll-body" id="kids-list"><div style="text-align:center;padding:2rem;color:#aaa;font-size:.85rem;">טוען...</div></div>
   <nav class="nav">
-    <button class="nav-item active" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
-    <button class="nav-item" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
-    <button class="nav-item" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+    <button class="nav-item active" data-nav="kids-overview"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item" data-nav="transfer"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item" data-nav="settings"><span class="nav-icon">⚙️</span>הגדרות</button>
   </nav>
 </div>
 
 <!-- ══ KID DETAIL ══ -->
 <div id="kid-detail" class="screen app-screen">
   <div class="hdr">
-    <button class="back-btn" onclick="showApp('kids-overview')">← חזרה</button>
+    <button class="back-btn" data-nav="kids-overview">← חזרה</button>
     <div class="hdr-row">
       <div><div class="hdr-title" id="detail-name">—</div></div>
     </div>
@@ -217,9 +217,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="tx-list" id="detail-tx-list"><div style="text-align:center;padding:2rem;color:#aaa;font-size:.85rem;">טוען...</div></div>
   </div>
   <nav class="nav">
-    <button class="nav-item" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
-    <button class="nav-item" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
-    <button class="nav-item" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+    <button class="nav-item" data-nav="kids-overview"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item" data-nav="transfer"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item" data-nav="settings"><span class="nav-icon">⚙️</span>הגדרות</button>
   </nav>
 </div>
 
@@ -228,7 +228,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="hdr">
     <div class="hdr-row">
       <div><div class="hdr-title">💸 העבר כסף</div><div class="hdr-sub">הפקד ישירות לחשבון הילד</div></div>
-      <button class="logout-btn" onclick="logout()">יציאה</button>
+      <button class="logout-btn" data-action="logout">יציאה</button>
     </div>
   </div>
   <div class="scroll-body">
@@ -241,21 +241,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <input class="form-input" id="transfer-amount" type="number" min="0" placeholder="כמה ₪?" style="font-size:1.3rem;font-weight:700;color:#059669;" />
       <div class="form-lbl">סיבה</div>
       <div class="cat-grid" id="transfer-cats">
-        <div class="cat-btn active" data-cat="ALLOWANCE" onclick="selectCat(this)">⭐ דמי כיס</div>
-        <div class="cat-btn" data-cat="GIFT" onclick="selectCat(this)">🎁 מתנה</div>
-        <div class="cat-btn" data-cat="BIRTHDAY" onclick="selectCat(this)">🎂 יום הולדת</div>
-        <div class="cat-btn" data-cat="OTHER" onclick="selectCat(this)">💰 אחר</div>
+        <div class="cat-btn active" data-cat="ALLOWANCE">⭐ דמי כיס</div>
+        <div class="cat-btn" data-cat="GIFT">🎁 מתנה</div>
+        <div class="cat-btn" data-cat="BIRTHDAY">🎂 יום הולדת</div>
+        <div class="cat-btn" data-cat="OTHER">💰 אחר</div>
       </div>
       <div class="form-lbl">הערה (אופציונלי)</div>
       <input class="form-input" id="transfer-note" placeholder="לדוגמה: דמי כיס לשבוע זה" />
-      <button class="confirm-btn" id="transfer-btn" onclick="handleTransfer()">✓ העבר</button>
+      <button class="confirm-btn" id="transfer-btn">✓ העבר</button>
       <div class="tx-msg" id="transfer-msg"></div>
     </div>
   </div>
   <nav class="nav">
-    <button class="nav-item" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
-    <button class="nav-item active" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
-    <button class="nav-item" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+    <button class="nav-item" data-nav="kids-overview"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item active" data-nav="transfer"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item" data-nav="settings"><span class="nav-icon">⚙️</span>הגדרות</button>
   </nav>
 </div>
 
@@ -264,7 +264,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="hdr">
     <div class="hdr-row">
       <div><div class="hdr-title">⚙️ הגדרות</div></div>
-      <button class="logout-btn" onclick="logout()">יציאה</button>
+      <button class="logout-btn" data-action="logout">יציאה</button>
     </div>
   </div>
   <div class="scroll-body">
@@ -274,7 +274,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="rate-row">
         <input class="rate-inp" id="rate-inp" type="number" min="0" max="100" step="1" value="12" />
         <span class="rate-unit">% לשנה</span>
-        <button class="rate-save" onclick="saveRate()">שמור</button>
+        <button class="rate-save" id="rate-save">שמור</button>
       </div>
       <div class="settings-msg" id="rate-msg"></div>
     </div>
@@ -284,7 +284,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="settings-hint">4 ספרות — נדרש בכניסה</div>
       <div class="pin-change-row">
         <span class="pin-status">●●●●</span>
-        <button class="pin-change-btn" onclick="togglePinChange()">שנה קוד</button>
+        <button class="pin-change-btn" id="pin-change-btn">שנה קוד</button>
       </div>
       <div id="new-pin-section" style="display:none;" class="new-pin-section">
         <div class="divider"></div>
@@ -296,27 +296,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <div class="new-pin-dot" id="npd3"></div>
         </div>
         <div class="pin-mini-pad">
-          <button class="pin-mini-key" onclick="newPinPress('1')">1</button>
-          <button class="pin-mini-key" onclick="newPinPress('2')">2</button>
-          <button class="pin-mini-key" onclick="newPinPress('3')">3</button>
-          <button class="pin-mini-key" onclick="newPinPress('4')">4</button>
-          <button class="pin-mini-key" onclick="newPinPress('5')">5</button>
-          <button class="pin-mini-key" onclick="newPinPress('6')">6</button>
-          <button class="pin-mini-key" onclick="newPinPress('7')">7</button>
-          <button class="pin-mini-key" onclick="newPinPress('8')">8</button>
-          <button class="pin-mini-key" onclick="newPinPress('9')">9</button>
+          <button class="pin-mini-key" data-new-digit="1">1</button>
+          <button class="pin-mini-key" data-new-digit="2">2</button>
+          <button class="pin-mini-key" data-new-digit="3">3</button>
+          <button class="pin-mini-key" data-new-digit="4">4</button>
+          <button class="pin-mini-key" data-new-digit="5">5</button>
+          <button class="pin-mini-key" data-new-digit="6">6</button>
+          <button class="pin-mini-key" data-new-digit="7">7</button>
+          <button class="pin-mini-key" data-new-digit="8">8</button>
+          <button class="pin-mini-key" data-new-digit="9">9</button>
           <div></div>
-          <button class="pin-mini-key" onclick="newPinPress('0')">0</button>
-          <button class="pin-mini-key del" onclick="newPinDel()">⌫</button>
+          <button class="pin-mini-key" data-new-digit="0">0</button>
+          <button class="pin-mini-key del" id="new-pin-del">⌫</button>
         </div>
         <div class="settings-msg" id="pin-msg"></div>
       </div>
     </div>
   </div>
   <nav class="nav">
-    <button class="nav-item" onclick="showApp('kids-overview')"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
-    <button class="nav-item" onclick="showApp('transfer')"><span class="nav-icon">💸</span>העברה</button>
-    <button class="nav-item active" onclick="showApp('settings')"><span class="nav-icon">⚙️</span>הגדרות</button>
+    <button class="nav-item" data-nav="kids-overview"><span class="nav-icon">👨‍👩‍👧‍👦</span>ילדים</button>
+    <button class="nav-item" data-nav="transfer"><span class="nav-icon">💸</span>העברה</button>
+    <button class="nav-item active" data-nav="settings"><span class="nav-icon">⚙️</span>הגדרות</button>
   </nav>
 </div>
 
@@ -400,7 +400,7 @@ async function loadKids() {
     const el = document.getElementById('kids-list');
     if (!state.kids.length) { el.innerHTML = '<div class="empty-state">אין ילדים רשומים</div>'; return; }
     el.innerHTML = state.kids.map(k => `
-      <div class="kid-card" onclick="openKidDetail(${k.id})">
+      <div class="kid-card" data-kid-id="${k.id}">
         <div class="kid-card-top">
           <div class="kid-name">${k.name} 🧒</div>
           <div class="kid-badge">ילד/ה</div>
@@ -410,7 +410,7 @@ async function loadKids() {
           <div class="kbi"><div class="kbi-lbl">עו"ש</div><div class="kbi-val">${fmt(k.checkingBalance)}</div></div>
           <div class="kbi"><div class="kbi-lbl">פיקדון</div><div class="kbi-val">${fmt(k.depositTotal)}</div></div>
         </div>
-        <button class="transfer-btn" onclick="event.stopPropagation(); openTransferFor(${k.id})">💸 העבר כסף ל${k.name}</button>
+        <button class="transfer-btn" data-transfer-for="${k.id}">💸 העבר כסף ל${k.name}</button>
       </div>`).join('');
   } catch (e) {
     document.getElementById('kids-list').innerHTML = `<div class="empty-state">${e.message}</div>`;
@@ -451,7 +451,7 @@ async function loadKidTransactions(kidId) {
             ${tx.voided
               ? '<div class="voided-tag">בוטל</div>'
               : (tx.type === 'INCOME' || tx.type === 'EXPENSE')
-                ? `<button class="void-btn" onclick="voidTx(${kidId}, ${tx.id})">ביטול</button>`
+                ? `<button class="void-btn" data-void-kid="${kidId}" data-void-tx="${tx.id}">ביטול</button>`
                 : ''}
           </div>
         </div>`;
@@ -480,7 +480,7 @@ async function loadTransferTabs() {
   if (!state.kids.length) state.kids = await api('/api/users');
   const el = document.getElementById('transfer-tabs');
   el.innerHTML = state.kids.map((k, i) => `
-    <button class="kid-tab ${i === 0 ? 'active' : ''}" onclick="selectKidTab(this, ${k.id})">${k.name}</button>
+    <button class="kid-tab ${i === 0 ? 'active' : ''}" data-kid-tab="${k.id}">${k.name}</button>
   `).join('');
   if (state.kids.length) state.selectedKidId = state.kids[0].id;
 }
@@ -592,6 +592,63 @@ async function saveNewPin() {
   }
 }
 
+function updatePinDots(prefix, buf) {
+  for (let i = 0; i < 4; i++)
+    document.getElementById(prefix + i)?.classList.toggle('filled', i < buf.length);
+}
+
+function setupEventListeners() {
+  // Nav buttons (data-nav="kids-overview" etc.)
+  document.querySelectorAll('[data-nav]').forEach(btn =>
+    btn.addEventListener('click', () => showApp(btn.dataset.nav)));
+
+  // Logout buttons
+  document.querySelectorAll('[data-action="logout"]').forEach(btn =>
+    btn.addEventListener('click', logout));
+
+  // Back button in kid-detail
+  document.querySelector('#kid-detail .back-btn')
+    ?.addEventListener('click', () => showApp('kids-overview'));
+
+  // Transfer confirm
+  document.getElementById('transfer-btn')
+    .addEventListener('click', handleTransfer);
+
+  // Category buttons — event delegation
+  document.getElementById('transfer-cats').addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
+    if (btn) selectCat(btn);
+  });
+
+  // Kids list — delegation for card click and transfer button
+  document.getElementById('kids-list').addEventListener('click', e => {
+    const transferBtn = e.target.closest('[data-transfer-for]');
+    const kidCard     = e.target.closest('[data-kid-id]');
+    if (transferBtn) { e.stopPropagation(); openTransferFor(+transferBtn.dataset.transferFor); }
+    else if (kidCard) openKidDetail(+kidCard.dataset.kidId);
+  });
+
+  // Transaction list — delegation for void buttons
+  document.getElementById('detail-tx-list').addEventListener('click', e => {
+    const btn = e.target.closest('[data-void-tx]');
+    if (btn) voidTx(+btn.dataset.voidKid, +btn.dataset.voidTx);
+  });
+
+  // Transfer kid tabs — delegation
+  document.getElementById('transfer-tabs').addEventListener('click', e => {
+    const btn = e.target.closest('[data-kid-tab]');
+    if (btn) selectKidTab(btn, +btn.dataset.kidTab);
+  });
+
+  // Settings
+  document.getElementById('rate-save').addEventListener('click', saveRate);
+  document.getElementById('pin-change-btn').addEventListener('click', togglePinChange);
+  document.getElementById('new-pin-del').addEventListener('click', newPinDel);
+  document.querySelectorAll('[data-new-digit]').forEach(btn =>
+    btn.addEventListener('click', () => newPinPress(btn.dataset.newDigit)));
+}
+
+setupEventListeners();
 autoLogin();
 </script>
 </body>
