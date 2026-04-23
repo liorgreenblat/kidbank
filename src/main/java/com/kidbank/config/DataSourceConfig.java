@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -11,8 +12,10 @@ import java.net.URI;
 /**
  * Converts Railway's postgresql://user:pass@host:port/db URL to JDBC format.
  * Falls back to individual PG* vars (local dev) if DATABASE_URL is not set.
+ * Skipped in test profile so H2 auto-config takes over.
  */
 @Configuration
+@Profile("!test")
 public class DataSourceConfig {
 
     @Bean
