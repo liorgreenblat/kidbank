@@ -26,7 +26,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .login-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.75rem; min-height: 1.2em; }
 
 /* ── App shell (dashboard + deposits) ── */
-.app-screen { background: #f5f0ff; display: flex; flex-direction: column; min-height: 100vh; }
+.app-screen { background: #f5f0ff; display: none; flex-direction: column; min-height: 100vh; }
+.app-screen.active { display: flex; }
 
 /* ── Header ── */
 .header-purple { background: #7c3aed; color: white; padding: 1rem 1.25rem 1.25rem; }
@@ -476,7 +477,6 @@ async function handleDepositAction() {
 
 // ── Enter key on login inputs ─────────────────────────────
 document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-document.getElementById('inp-name').addEventListener('keydown',     e => { if (e.key === 'Enter') handleLogin(); });
 
 // ── Auto-login if session saved ───────────────────────────
 if (state.userId) showScreen('dashboard');

@@ -358,7 +358,7 @@ async function openKidDetail(kidId) {
 
 async function loadKidTransactions(kidId) {
   const el = document.getElementById('detail-tx-list');
-  const TYPE_LABELS = { INCOME: 'הכנסה', EXPENSE: 'הוצאה', DEPOSIT_IN: 'פיקדון - הפקדה', DEPOSIT_OUT: 'פיקדון - משיכה' };
+  const TYPE_LABELS = { INCOME: 'הכנסה', EXPENSE: 'הוצאה', DEPOSIT_IN: 'הפקדה לחיסכון', DEPOSIT_OUT: 'משיכה מחיסכון' };
   try {
     const txs = await api(`/api/users/${kidId}/transactions`);
     if (!txs.length) { el.innerHTML = '<div class="empty-state">אין תנועות עדיין</div>'; return; }
