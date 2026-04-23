@@ -353,7 +353,11 @@ async function loadDashboard() {
 
     renderTxList(txs);
   } catch (e) {
-    document.getElementById('tx-list').innerHTML = `<div class="empty-state">${e.message}</div>`;
+    // Stale saved session — clear and return to login
+    localStorage.removeItem('kidbank_userId');
+    localStorage.removeItem('kidbank_userName');
+    state.userId = null;
+    showScreen('login');
   }
 }
 
