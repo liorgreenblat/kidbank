@@ -355,7 +355,7 @@ async function api(path, opts = {}) {
   const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.detail || body.title || 'שגיאה');
+    throw new Error(body.detail || body.message || body.title || 'שגיאה');
   }
   if (res.status === 204) return null;
   return res.json().catch(() => null);
