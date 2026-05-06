@@ -333,9 +333,21 @@ const API = '';  // same origin — change to 'http://your-server' for external 
 const state = {
   userId: localStorage.getItem('kidbank_userId'),
   userName: localStorage.getItem('kidbank_userName'),
+  username: localStorage.getItem('kidbank_username'),
   range: 'month',
   depTab: 'add',
 };
+
+// Feature flags — for now Earn is test-only until backend is wired up
+const EARN_ENABLED_FOR = ['test'];
+function isEarnEnabled() { return EARN_ENABLED_FOR.includes(state.username); }
+function applyFeatureFlags() {
+  const show = isEarnEnabled();
+  ['nav-earn-1', 'nav-earn-2', 'nav-earn-3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? '' : 'none';
+  });
+}
 
 const RANGES = ['month', 'half', 'year'];
 const RANGE_LABELS = { month: 'חודש', half: 'חצי שנה', year: 'שנה' };
@@ -375,6 +387,7 @@ async function api(path, opts = {}) {
 
 // ── Screen switching ──────────────────────────────────────
 function showScreen(name) {
+  if (name === 'earn' && !isEarnEnabled()) name = 'dashboard';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(name).classList.add('active');
   if (name === 'dashboard') loadDashboard();
@@ -401,15 +414,21 @@ async function handleLogin() {
 function saveUser(user) {
   state.userId = user.id;
   state.userName = user.name;
+  state.username = user.username;
   localStorage.setItem('kidbank_userId', user.id);
   localStorage.setItem('kidbank_userName', user.name);
+  localStorage.setItem('kidbank_username', user.username);
+  applyFeatureFlags();
   showScreen('dashboard');
 }
 
 function logout() {
   localStorage.removeItem('kidbank_userId');
   localStorage.removeItem('kidbank_userName');
+  localStorage.removeItem('kidbank_username');
   state.userId = null;
+  state.username = null;
+  applyFeatureFlags();
   document.getElementById('inp-username').value = '';
   document.getElementById('login-error').textContent = '';
   showScreen('login');
@@ -424,6 +443,11 @@ async function loadDashboard() {
       api(`/api/users/${state.userId}/transactions?range=${state.range}`),
     ]);
 
+    if (user.username && user.username !== state.username) {
+      state.username = user.username;
+      localStorage.setItem('kidbank_username', user.username);
+      applyFeatureFlags();
+    }
     document.getElementById('dash-name').textContent = user.name + ' 👋';
     document.getElementById('dash-checking').textContent = fmt(user.checkingBalance);
     document.getElementById('dash-deposit').textContent  = fmt(user.depositTotal);
@@ -659,7 +683,8 @@ function claimTask(id) {
 // ── Enter key on login inputs ─────────────────────────────
 document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 
-// ── Auto-login if session saved ───────────────────────────
+// ── Apply feature flags for current user, then auto-login ─
+applyFeatureFlags();
 if (state.userId) showScreen('dashboard');
 </script>
 </body>
