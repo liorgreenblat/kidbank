@@ -116,6 +116,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* ── Logout btn ── */
 .logout-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 0.75rem; cursor: pointer; padding: 0; }
 .logout-btn:active { color: white; }
+
+/* ── Earn screen ── */
+.header-green { background: linear-gradient(160deg, #059669 0%, #10b981 100%); color: white; padding: 1rem 1.25rem 1.25rem; }
+.earn-hint { font-size: 0.72rem; opacity: 0.9; margin-top: 0.5rem; line-height: 1.35; }
+.potential-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1.1rem; display: flex; justify-content: space-between; align-items: center; }
+.potential-lbl { font-size: 0.78rem; color: #888; }
+.potential-amt { font-size: 1.5rem; font-weight: 700; color: #059669; }
+.potential-sub { font-size: 0.7rem; color: #aaa; margin-top: 2px; }
+
+.task-list { padding: 0 1rem; }
+.task-card { background: white; border-radius: 14px; padding: 0.75rem 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.task-card.pending { background: #fffbeb; border: 1px solid #fde68a; }
+.task-card.done { opacity: 0.7; }
+.task-ico { width: 38px; height: 38px; border-radius: 50%; background: #ecfdf5; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.task-ico.pending { background: #fef3c7; }
+.task-ico.done { background: #f3f4f6; }
+.task-info { flex: 1; min-width: 0; }
+.task-title { font-size: 0.88rem; font-weight: 600; color: #333; }
+.task-desc { font-size: 0.7rem; color: #888; margin-top: 1px; }
+.task-meta { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
+.task-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.task-amt { font-size: 0.95rem; font-weight: 700; color: #059669; }
+.task-amt.done { color: #aaa; }
+.task-btn { background: #059669; color: white; border: none; border-radius: 8px; padding: 0.35rem 0.7rem; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+.task-btn:active { background: #047857; }
+.task-btn.pending { background: #f59e0b; cursor: default; }
+.task-status { font-size: 0.7rem; color: #059669; font-weight: 600; }
+
+.earn-empty { text-align: center; color: #aaa; font-size: 0.8rem; padding: 1rem; }
 </style>
 </head>
 <body>
@@ -180,6 +209,53 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="nav-item active" onclick="showScreen('dashboard')">
       <span class="nav-icon">🏠</span>בית
     </button>
+    <button class="nav-item" id="nav-earn-1" type="button">
+      <span class="nav-icon">💪</span>להרוויח
+    </button>
+    <button class="nav-item" onclick="showScreen('deposits')">
+      <span class="nav-icon">🏦</span>פיקדונות
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════ EARN SCREEN ══════════ -->
+<div id="earn" class="screen app-screen">
+  <div class="header-green">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="header-name">💪 להרוויח כסף</div>
+        <div class="earn-hint">לא הכל מקבלים — חלק מרוויחים. בחר משימה והתחל!</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+  </div>
+
+  <div class="scroll-body">
+    <div class="potential-card">
+      <div>
+        <div class="potential-lbl">פוטנציאל החודש</div>
+        <div class="potential-sub">משימות פתוחות שעוד לא לקחת</div>
+      </div>
+      <div class="potential-amt" id="earn-potential">₪ 0</div>
+    </div>
+
+    <div class="sec-title">🎯 משימות זמינות</div>
+    <div class="task-list" id="earn-available"></div>
+
+    <div class="sec-title">⏳ ממתין לאישור הורה</div>
+    <div class="task-list" id="earn-pending"></div>
+
+    <div class="sec-title">✅ הושלמו החודש</div>
+    <div class="task-list" id="earn-done"></div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item" onclick="showScreen('dashboard')">
+      <span class="nav-icon">🏠</span>בית
+    </button>
+    <button class="nav-item active" id="nav-earn-2" type="button">
+      <span class="nav-icon">💪</span>להרוויח
+    </button>
     <button class="nav-item" onclick="showScreen('deposits')">
       <span class="nav-icon">🏦</span>פיקדונות
     </button>
@@ -241,6 +317,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="nav-item" onclick="showScreen('dashboard')">
       <span class="nav-icon">🏠</span>בית
     </button>
+    <button class="nav-item" id="nav-earn-3" type="button">
+      <span class="nav-icon">💪</span>להרוויח
+    </button>
     <button class="nav-item active" onclick="showScreen('deposits')">
       <span class="nav-icon">🏦</span>פיקדונות
     </button>
@@ -300,6 +379,7 @@ function showScreen(name) {
   document.getElementById(name).classList.add('active');
   if (name === 'dashboard') loadDashboard();
   if (name === 'deposits')  loadDeposits();
+  if (name === 'earn')      loadEarn();
 }
 
 // ── Login flow ────────────────────────────────────────────
@@ -474,6 +554,107 @@ async function handleDepositAction() {
     msgEl.textContent = e.message;
   }
 }
+
+// ── Earn (mockup, static data) ────────────────────────────
+const earnMock = {
+  available: [
+    { id: 1, icon: '🛏️', title: 'סדר את החדר', desc: 'מיטה, רצפה, שולחן', amount: 10 },
+    { id: 2, icon: '🐕', title: 'הוצא את הכלב', desc: 'הליכה של 20 דקות', amount: 8 },
+    { id: 3, icon: '🍽️', title: 'עזור עם הכלים', desc: 'לרוקן את המדיח', amount: 5 },
+    { id: 4, icon: '🗑️', title: 'הוצא את הזבל', desc: 'כל פחי הבית', amount: 3 },
+  ],
+  pending: [
+    { id: 101, icon: '🛏️', title: 'סדר את החדר', amount: 10, submittedAt: 'אתמול, 18:42' },
+  ],
+  done: [
+    { id: 201, icon: '🐕', title: 'הוצא את הכלב', amount: 8, doneAt: 'לפני 3 ימים' },
+    { id: 202, icon: '🗑️', title: 'הוצא את הזבל', amount: 3, doneAt: 'לפני שבוע' },
+  ],
+};
+
+function loadEarn() {
+  const potential = earnMock.available.reduce((s, t) => s + t.amount, 0);
+  document.getElementById('earn-potential').textContent = '₪ ' + potential;
+  renderEarnAvailable();
+  renderEarnPending();
+  renderEarnDone();
+}
+
+function renderEarnAvailable() {
+  const el = document.getElementById('earn-available');
+  if (!earnMock.available.length) { el.innerHTML = '<div class="earn-empty">אין משימות חדשות. בקש מההורים להוסיף!</div>'; return; }
+  el.innerHTML = earnMock.available.map(t => `
+    <div class="task-card">
+      <div class="task-ico">${t.icon}</div>
+      <div class="task-info">
+        <div class="task-title">${t.title}</div>
+        <div class="task-desc">${t.desc}</div>
+      </div>
+      <div class="task-right">
+        <div class="task-amt">₪ ${t.amount}</div>
+        <button class="task-btn" data-task-id="${t.id}">סיימתי!</button>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.task-btn').forEach(btn => {
+    btn.addEventListener('click', () => claimTask(Number(btn.dataset.taskId)));
+  });
+}
+
+function renderEarnPending() {
+  const el = document.getElementById('earn-pending');
+  if (!earnMock.pending.length) { el.innerHTML = '<div class="earn-empty">אין משימות בהמתנה</div>'; return; }
+  el.innerHTML = earnMock.pending.map(t => `
+    <div class="task-card pending">
+      <div class="task-ico pending">${t.icon}</div>
+      <div class="task-info">
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">נשלח לאישור — ${t.submittedAt}</div>
+      </div>
+      <div class="task-right">
+        <div class="task-amt">₪ ${t.amount}</div>
+        <span class="task-status" style="color:#f59e0b">ממתין ⏳</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderEarnDone() {
+  const el = document.getElementById('earn-done');
+  if (!earnMock.done.length) { el.innerHTML = '<div class="earn-empty">עדיין לא השלמת משימות החודש</div>'; return; }
+  el.innerHTML = earnMock.done.map(t => `
+    <div class="task-card done">
+      <div class="task-ico done">${t.icon}</div>
+      <div class="task-info">
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">${t.doneAt}</div>
+      </div>
+      <div class="task-right">
+        <div class="task-amt done">+₪ ${t.amount}</div>
+        <span class="task-status">שולם ✓</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function claimTask(id) {
+  const idx = earnMock.available.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  const task = earnMock.available.splice(idx, 1)[0];
+  earnMock.pending.unshift({
+    id: 1000 + id,
+    icon: task.icon,
+    title: task.title,
+    amount: task.amount,
+    submittedAt: 'עכשיו',
+  });
+  loadEarn();
+}
+
+['nav-earn-1', 'nav-earn-2', 'nav-earn-3'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener('click', () => showScreen('earn'));
+});
 
 // ── Enter key on login inputs ─────────────────────────────
 document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
