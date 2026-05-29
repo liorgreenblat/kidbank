@@ -294,6 +294,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="proj-card">
       <div class="proj-hdr">📊 כמה יהיה לי...</div>
       <div class="proj-row">
+        <span class="proj-period">עוד שבוע</span>
+        <div class="proj-right"><span class="proj-amt" id="proj-1w">—</span><span class="proj-gain" id="proj-1w-gain"></span></div>
+      </div>
+      <div class="proj-row">
         <span class="proj-period">עוד חודש</span>
         <div class="proj-right"><span class="proj-amt" id="proj-1m">—</span><span class="proj-gain" id="proj-1m-gain"></span></div>
       </div>
@@ -521,6 +525,8 @@ function renderDeposit(dep) {
     return g > 0 ? `+₪${g}` : '';
   };
   const base = Number(dep.totalAmount);
+  document.getElementById('proj-1w').textContent      = fmt(dep.projectedOneWeek);
+  document.getElementById('proj-1w-gain').textContent = gain(dep.projectedOneWeek, base);
   document.getElementById('proj-1m').textContent      = fmt(dep.projectedOneMonth);
   document.getElementById('proj-1m-gain').textContent = gain(dep.projectedOneMonth, base);
   document.getElementById('proj-6m').textContent      = fmt(dep.projectedSixMonths);

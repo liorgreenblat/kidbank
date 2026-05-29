@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -38,7 +40,7 @@ class DepositServiceTest {
                 .checkingBalance(new BigDecimal("200.00")).build();
         mockDeposit = Deposit.builder().id(1L).user(mockUser)
                 .totalAmount(new BigDecimal("80.00")).interestRate(new BigDecimal("0.12")).build();
-        when(userService.findUser(1L)).thenReturn(mockUser);
+        lenient().when(userService.findUser(1L)).thenReturn(mockUser);
         AppSettings defaultSettings = new AppSettings();
         lenient().when(appSettingsService.getOrCreate()).thenReturn(defaultSettings);
     }
@@ -128,5 +130,77 @@ class DepositServiceTest {
 
         assertThat(res.getTotalAmount()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(res.getInterestRate()).isEqualByComparingTo(new BigDecimal("0.12"));
+    }
+
+    @Test
+    void getDeposit_includesOneWeekProjection() {
+        when(depositRepository.findByUserId(1L)).thenReturn(Optional.of(mockDeposit));
+
+        DepositResponse res = depositService.getDeposit(1L);
+
+        // 80 * (1 + 0.12 * 7/365) ≈ 80.184
+        assertThat(res.getProjectedOneWeek())
+                .isCloseTo(new BigDecimal("80.18"), within(new BigDecimal("0.02")));
+    }
+
+    @Test
+    void applyPendingInterest_compoundsBalanceForElapsedDays() {
+        Deposit d = Deposit.builder().id(9L).user(mockUser)
+                .totalAmount(new BigDecimal("100.00"))
+                .interestRate(new BigDecimal("0.365"))  // 0.1% per day for easy math
+                .build();
+        d.setLastInterestDate(LocalDate.now().minusDays(10));
+
+        boolean changed = depositService.applyPendingInterest(d);
+
+        assertThat(changed).isTrue();
+        // 100 * (1.001)^10 ≈ 101.0045
+        assertThat(d.getTotalAmount())
+                .isCloseTo(new BigDecimal("101.00"), within(new BigDecimal("0.05")));
+        assertThat(d.getLastInterestDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void applyPendingInterest_noOpWhenAlreadyToday() {
+        Deposit d = Deposit.builder().user(mockUser)
+                .totalAmount(new BigDecimal("100.00"))
+                .interestRate(new BigDecimal("0.12")).build();
+        d.setLastInterestDate(LocalDate.now());
+
+        boolean changed = depositService.applyPendingInterest(d);
+
+        assertThat(changed).isFalse();
+        assertThat(d.getTotalAmount()).isEqualByComparingTo(new BigDecimal("100.00"));
+    }
+
+    @Test
+    void applyPendingInterest_zeroBalance_justBumpsDateNoGrowth() {
+        Deposit d = Deposit.builder().user(mockUser)
+                .totalAmount(BigDecimal.ZERO)
+                .interestRate(new BigDecimal("0.12")).build();
+        d.setLastInterestDate(LocalDate.now().minusDays(30));
+
+        depositService.applyPendingInterest(d);
+
+        assertThat(d.getTotalAmount()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(d.getLastInterestDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void accrueInterestForAllDeposits_savesUpdatedOnes() {
+        Deposit stale = Deposit.builder().id(1L).user(mockUser)
+                .totalAmount(new BigDecimal("100.00"))
+                .interestRate(new BigDecimal("0.12")).build();
+        stale.setLastInterestDate(LocalDate.now().minusDays(2));
+        Deposit fresh = Deposit.builder().id(2L).user(mockUser)
+                .totalAmount(new BigDecimal("50.00"))
+                .interestRate(new BigDecimal("0.12")).build();
+        fresh.setLastInterestDate(LocalDate.now());
+        when(depositRepository.findAll()).thenReturn(List.of(stale, fresh));
+
+        depositService.accrueInterestForAllDeposits();
+
+        verify(depositRepository, times(1)).save(stale);
+        verify(depositRepository, never()).save(fresh);
     }
 }

@@ -140,6 +140,7 @@ public class Dtos {
         public Long id;
         public BigDecimal totalAmount;
         public BigDecimal interestRate;
+        public BigDecimal projectedOneWeek;
         public BigDecimal projectedOneMonth;
         public BigDecimal projectedSixMonths;
         public BigDecimal projectedOneYear;
@@ -149,11 +150,13 @@ public class Dtos {
         public static Builder builder() { return new Builder(); }
         public static class Builder {
             private Long id; private BigDecimal totalAmount; private BigDecimal interestRate;
+            private BigDecimal projectedOneWeek;
             private BigDecimal projectedOneMonth; private BigDecimal projectedSixMonths;
             private BigDecimal projectedOneYear; private LocalDateTime createdAt;
             public Builder id(Long id) { this.id = id; return this; }
             public Builder totalAmount(BigDecimal a) { this.totalAmount = a; return this; }
             public Builder interestRate(BigDecimal r) { this.interestRate = r; return this; }
+            public Builder projectedOneWeek(BigDecimal p) { this.projectedOneWeek = p; return this; }
             public Builder projectedOneMonth(BigDecimal p) { this.projectedOneMonth = p; return this; }
             public Builder projectedSixMonths(BigDecimal p) { this.projectedSixMonths = p; return this; }
             public Builder projectedOneYear(BigDecimal p) { this.projectedOneYear = p; return this; }
@@ -161,6 +164,7 @@ public class Dtos {
             public DepositResponse build() {
                 DepositResponse r = new DepositResponse();
                 r.id = id; r.totalAmount = totalAmount; r.interestRate = interestRate;
+                r.projectedOneWeek = projectedOneWeek;
                 r.projectedOneMonth = projectedOneMonth; r.projectedSixMonths = projectedSixMonths;
                 r.projectedOneYear = projectedOneYear; r.createdAt = createdAt;
                 return r;
@@ -169,6 +173,7 @@ public class Dtos {
         public Long getId() { return id; }
         public BigDecimal getTotalAmount() { return totalAmount; }
         public BigDecimal getInterestRate() { return interestRate; }
+        public BigDecimal getProjectedOneWeek() { return projectedOneWeek; }
         public BigDecimal getProjectedOneMonth() { return projectedOneMonth; }
         public BigDecimal getProjectedSixMonths() { return projectedSixMonths; }
         public BigDecimal getProjectedOneYear() { return projectedOneYear; }
