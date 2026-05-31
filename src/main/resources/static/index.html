@@ -145,6 +145,45 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .task-status { font-size: 0.7rem; color: #059669; font-weight: 600; }
 
 .earn-empty { text-align: center; color: #aaa; font-size: 0.8rem; padding: 1rem; }
+
+/* ── Pay screen ── */
+.header-orange { background: linear-gradient(160deg, #ea580c 0%, #fb923c 100%); color: white; padding: 1rem 1.25rem 1.25rem; }
+.pay-hint { font-size: 0.72rem; opacity: 0.9; margin-top: 0.5rem; line-height: 1.35; }
+
+.pay-balance-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1.1rem; text-align: center; }
+.pay-balance-lbl { font-size: 0.75rem; color: #888; }
+.pay-balance-amt { font-size: 1.6rem; font-weight: 700; color: #333; margin-top: 2px; }
+
+.pay-amount-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 1rem 1.1rem; }
+.pay-amount-lbl { font-size: 0.78rem; color: #555; font-weight: 600; margin-bottom: 0.5rem; }
+.pay-amount-row { display: flex; align-items: baseline; gap: 6px; border-bottom: 2px solid #ea580c; padding-bottom: 4px; }
+.pay-amount-currency { font-size: 1.5rem; color: #ea580c; font-weight: 700; }
+.pay-amount-inp { flex: 1; border: none; outline: none; font-size: 2rem; font-weight: 700; color: #333; text-align: right; direction: rtl; background: transparent; padding: 0; }
+.pay-amount-inp::placeholder { color: #ddd; }
+.pay-amount-err { font-size: 0.7rem; color: #dc2626; margin-top: 0.4rem; min-height: 1em; }
+
+.pay-cat-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1.1rem; }
+.pay-cat-lbl { font-size: 0.78rem; color: #555; font-weight: 600; margin-bottom: 0.6rem; }
+.pay-cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pay-cat { background: #fafafa; border: 2px solid transparent; border-radius: 12px; padding: 0.6rem 0.4rem; text-align: center; cursor: pointer; transition: transform 0.1s; }
+.pay-cat:active { transform: scale(0.96); }
+.pay-cat.selected { border-color: #ea580c; background: #fff7ed; }
+.pay-cat-ico { font-size: 1.5rem; }
+.pay-cat-name { font-size: 0.7rem; color: #555; margin-top: 2px; font-weight: 500; }
+.pay-cat.selected .pay-cat-name { color: #ea580c; font-weight: 700; }
+
+.pay-note-card { margin: 0.75rem 1rem 0; background: white; border-radius: 16px; padding: 0.9rem 1.1rem; }
+.pay-note-lbl { font-size: 0.78rem; color: #555; font-weight: 600; margin-bottom: 0.5rem; }
+.pay-note-inp { width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.85rem; text-align: right; direction: rtl; outline: none; background: #fafafa; }
+.pay-note-inp:focus { border-color: #ea580c; background: white; }
+
+.pay-action-wrap { margin: 1rem 1rem 0; }
+.pay-action-btn { width: 100%; background: #ea580c; color: white; border: none; border-radius: 14px; padding: 0.95rem; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+.pay-action-btn:active { background: #c2410c; }
+.pay-action-btn:disabled { background: #fed7aa; color: white; cursor: not-allowed; }
+.pay-msg { font-size: 0.78rem; text-align: center; margin-top: 0.5rem; min-height: 1.2em; }
+.pay-msg.ok { color: #059669; font-weight: 600; }
+.pay-msg.err { color: #dc2626; }
 </style>
 </head>
 <body>
@@ -212,6 +251,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="nav-item" id="nav-earn-1" type="button">
       <span class="nav-icon">💪</span>להרוויח
     </button>
+    <button class="nav-item" id="nav-pay-1" type="button">
+      <span class="nav-icon">💳</span>לשלם
+    </button>
     <button class="nav-item" onclick="showScreen('deposits')">
       <span class="nav-icon">🏦</span>פיקדונות
     </button>
@@ -255,6 +297,87 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </button>
     <button class="nav-item active" id="nav-earn-2" type="button">
       <span class="nav-icon">💪</span>להרוויח
+    </button>
+    <button class="nav-item" id="nav-pay-2" type="button">
+      <span class="nav-icon">💳</span>לשלם
+    </button>
+    <button class="nav-item" onclick="showScreen('deposits')">
+      <span class="nav-icon">🏦</span>פיקדונות
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════ PAY SCREEN ══════════ -->
+<div id="pay" class="screen app-screen">
+  <div class="header-orange">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="header-name">💳 לשלם</div>
+        <div class="pay-hint">כל הוצאה נרשמת ויורדת מהיתרה שלך מיד</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">יציאה</button>
+    </div>
+  </div>
+
+  <div class="scroll-body">
+    <div class="pay-balance-card">
+      <div class="pay-balance-lbl">היתרה שלי בעו"ש</div>
+      <div class="pay-balance-amt" id="pay-balance">₪ —</div>
+    </div>
+
+    <div class="pay-amount-card">
+      <div class="pay-amount-lbl">כמה לשלם?</div>
+      <div class="pay-amount-row">
+        <span class="pay-amount-currency">₪</span>
+        <input class="pay-amount-inp" id="pay-amount" type="number" min="0" step="0.5" placeholder="0" inputmode="decimal" />
+      </div>
+      <div class="pay-amount-err" id="pay-amount-err"></div>
+    </div>
+
+    <div class="pay-cat-card">
+      <div class="pay-cat-lbl">על מה?</div>
+      <div class="pay-cat-grid" id="pay-cat-grid">
+        <button class="pay-cat" type="button" data-cat="FOOD">
+          <div class="pay-cat-ico">🍕</div><div class="pay-cat-name">אוכל</div>
+        </button>
+        <button class="pay-cat" type="button" data-cat="ENTERTAINMENT">
+          <div class="pay-cat-ico">🎮</div><div class="pay-cat-name">בידור</div>
+        </button>
+        <button class="pay-cat" type="button" data-cat="TOYS">
+          <div class="pay-cat-ico">🧸</div><div class="pay-cat-name">צעצועים</div>
+        </button>
+        <button class="pay-cat" type="button" data-cat="BOOKS">
+          <div class="pay-cat-ico">📚</div><div class="pay-cat-name">ספרים</div>
+        </button>
+        <button class="pay-cat" type="button" data-cat="GIFT">
+          <div class="pay-cat-ico">🎁</div><div class="pay-cat-name">מתנה</div>
+        </button>
+        <button class="pay-cat" type="button" data-cat="OTHER">
+          <div class="pay-cat-ico">💰</div><div class="pay-cat-name">אחר</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="pay-note-card">
+      <div class="pay-note-lbl">תיאור (לא חובה)</div>
+      <input class="pay-note-inp" id="pay-note" type="text" placeholder="למשל: שווארמה ברחוב הראשי" maxlength="60" />
+    </div>
+
+    <div class="pay-action-wrap">
+      <button class="pay-action-btn" id="pay-submit" type="button" disabled>בחר סכום וקטגוריה</button>
+      <div class="pay-msg" id="pay-msg"></div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item" onclick="showScreen('dashboard')">
+      <span class="nav-icon">🏠</span>בית
+    </button>
+    <button class="nav-item" id="nav-earn-4" type="button">
+      <span class="nav-icon">💪</span>להרוויח
+    </button>
+    <button class="nav-item active" id="nav-pay-4" type="button">
+      <span class="nav-icon">💳</span>לשלם
     </button>
     <button class="nav-item" onclick="showScreen('deposits')">
       <span class="nav-icon">🏦</span>פיקדונות
@@ -320,6 +443,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="nav-item" id="nav-earn-3" type="button">
       <span class="nav-icon">💪</span>להרוויח
     </button>
+    <button class="nav-item" id="nav-pay-3" type="button">
+      <span class="nav-icon">💳</span>לשלם
+    </button>
     <button class="nav-item active" onclick="showScreen('deposits')">
       <span class="nav-icon">🏦</span>פיקדונות
     </button>
@@ -338,14 +464,20 @@ const state = {
   depTab: 'add',
 };
 
-// Feature flags — for now Earn is test-only until backend is wired up
+// Feature flags — Earn & Pay are test-only until backend is wired up
 const EARN_ENABLED_FOR = ['test'];
+const PAY_ENABLED_FOR  = ['test'];
 function isEarnEnabled() { return EARN_ENABLED_FOR.includes(state.username); }
+function isPayEnabled()  { return PAY_ENABLED_FOR.includes(state.username); }
 function applyFeatureFlags() {
-  const show = isEarnEnabled();
-  ['nav-earn-1', 'nav-earn-2', 'nav-earn-3'].forEach(id => {
+  const earn = isEarnEnabled(), pay = isPayEnabled();
+  ['nav-earn-1','nav-earn-2','nav-earn-3','nav-earn-4'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = show ? '' : 'none';
+    if (el) el.style.display = earn ? '' : 'none';
+  });
+  ['nav-pay-1','nav-pay-2','nav-pay-3','nav-pay-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = pay ? '' : 'none';
   });
 }
 
@@ -388,11 +520,13 @@ async function api(path, opts = {}) {
 // ── Screen switching ──────────────────────────────────────
 function showScreen(name) {
   if (name === 'earn' && !isEarnEnabled()) name = 'dashboard';
+  if (name === 'pay'  && !isPayEnabled())  name = 'dashboard';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(name).classList.add('active');
   if (name === 'dashboard') loadDashboard();
   if (name === 'deposits')  loadDeposits();
   if (name === 'earn')      loadEarn();
+  if (name === 'pay')       loadPay();
 }
 
 // ── Login flow ────────────────────────────────────────────
@@ -675,10 +809,120 @@ function claimTask(id) {
   loadEarn();
 }
 
-['nav-earn-1', 'nav-earn-2', 'nav-earn-3'].forEach(id => {
+['nav-earn-1', 'nav-earn-2', 'nav-earn-3', 'nav-earn-4'].forEach(id => {
   const btn = document.getElementById(id);
   if (btn) btn.addEventListener('click', () => showScreen('earn'));
 });
+
+['nav-pay-1', 'nav-pay-2', 'nav-pay-3', 'nav-pay-4'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener('click', () => showScreen('pay'));
+});
+
+// ── Pay (mockup — UI only, no backend wiring yet) ─────────
+const payState = {
+  category: null,
+  // Local mockup balance — refreshed from API on screen open, decremented on "pay"
+  mockBalance: null,
+};
+
+async function loadPay() {
+  // Reset form on entry
+  payState.category = null;
+  document.getElementById('pay-amount').value = '';
+  document.getElementById('pay-note').value = '';
+  document.getElementById('pay-msg').textContent = '';
+  document.getElementById('pay-msg').className = 'pay-msg';
+  document.getElementById('pay-amount-err').textContent = '';
+  document.querySelectorAll('.pay-cat').forEach(el => el.classList.remove('selected'));
+  updatePaySubmitState();
+
+  // Fetch the latest checking balance
+  try {
+    const user = await api(`/api/users/${state.userId}`);
+    payState.mockBalance = Number(user.checkingBalance);
+    document.getElementById('pay-balance').textContent = fmt(payState.mockBalance);
+  } catch (e) {
+    document.getElementById('pay-balance').textContent = '₪ —';
+  }
+}
+
+function updatePaySubmitState() {
+  const btn = document.getElementById('pay-submit');
+  const raw = document.getElementById('pay-amount').value;
+  const amount = parseFloat(raw);
+  const hasAmount = !isNaN(amount) && amount > 0;
+  const hasCat = !!payState.category;
+  if (hasAmount && hasCat) {
+    btn.disabled = false;
+    btn.textContent = `שלם ₪ ${amount.toFixed(2)}`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = !hasAmount ? 'הזן סכום' : 'בחר קטגוריה';
+  }
+}
+
+async function handlePaySubmit() {
+  const raw = document.getElementById('pay-amount').value;
+  const amount = parseFloat(raw);
+  const note = document.getElementById('pay-note').value.trim();
+  const msgEl = document.getElementById('pay-msg');
+  const errEl = document.getElementById('pay-amount-err');
+  const btn   = document.getElementById('pay-submit');
+  msgEl.className = 'pay-msg';
+  errEl.textContent = '';
+
+  if (!amount || amount <= 0)        { errEl.textContent = 'נא להזין סכום תקין'; return; }
+  if (payState.mockBalance == null)  { errEl.textContent = 'לא ניתן לטעון יתרה'; return; }
+  if (amount > payState.mockBalance) { errEl.textContent = 'אין מספיק כסף בחשבון'; return; }
+  if (!payState.category)            { msgEl.className = 'pay-msg err'; msgEl.textContent = 'נא לבחור קטגוריה'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'שולח...';
+
+  try {
+    await api(`/api/users/${state.userId}/transactions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'EXPENSE',
+        amount,
+        category: payState.category,
+        description: note || categoryLabel(payState.category) || 'הוצאה',
+      }),
+    });
+
+    // Refresh balance from server so the displayed number is ground truth
+    const user = await api(`/api/users/${state.userId}`);
+    payState.mockBalance = Number(user.checkingBalance);
+    document.getElementById('pay-balance').textContent = fmt(payState.mockBalance);
+
+    const catLabel = categoryLabel(payState.category) || 'הוצאה';
+    msgEl.className = 'pay-msg ok';
+    msgEl.textContent = `✓ שולם ₪${amount.toFixed(2)} על ${catLabel}${note ? ' — ' + note : ''}`;
+
+    // Reset form for next payment
+    document.getElementById('pay-amount').value = '';
+    document.getElementById('pay-note').value = '';
+    document.querySelectorAll('.pay-cat').forEach(el => el.classList.remove('selected'));
+    payState.category = null;
+    updatePaySubmitState();
+  } catch (e) {
+    msgEl.className = 'pay-msg err';
+    msgEl.textContent = e.message || 'שגיאה בתשלום, נסה שוב';
+    updatePaySubmitState();
+  }
+}
+
+document.querySelectorAll('.pay-cat').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.pay-cat').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    payState.category = el.dataset.cat;
+    updatePaySubmitState();
+  });
+});
+document.getElementById('pay-amount').addEventListener('input', updatePaySubmitState);
+document.getElementById('pay-submit').addEventListener('click', handlePaySubmit);
 
 // ── Enter key on login inputs ─────────────────────────────
 document.getElementById('inp-username').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
