@@ -2,6 +2,7 @@ package com.kidbank.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +25,10 @@ public class Deposit {
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    /** Date interest was last applied. Null for legacy rows — treated as "today" on first read. */
+    @Column(name = "last_interest_date")
+    private LocalDate lastInterestDate = LocalDate.now();
 
     public Deposit() {}
 
@@ -57,9 +62,11 @@ public class Deposit {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public BigDecimal getInterestRate() { return interestRate; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDate getLastInterestDate() { return lastInterestDate; }
     public void setId(Long id) { this.id = id; }
     public void setUser(User user) { this.user = user; }
     public void setTotalAmount(BigDecimal a) { this.totalAmount = a; }
     public void setInterestRate(BigDecimal r) { this.interestRate = r; }
     public void setCreatedAt(LocalDateTime t) { this.createdAt = t; }
+    public void setLastInterestDate(LocalDate d) { this.lastInterestDate = d; }
 }
