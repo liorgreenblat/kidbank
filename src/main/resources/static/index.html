@@ -466,7 +466,7 @@ const state = {
 
 // Feature flags — Earn & Pay are test-only until backend is wired up
 const EARN_ENABLED_FOR = ['test'];
-const PAY_ENABLED_FOR  = ['test'];
+const PAY_ENABLED_FOR  = ['test', 'bar', 'gal'];
 function isEarnEnabled() { return EARN_ENABLED_FOR.includes(state.username); }
 function isPayEnabled()  { return PAY_ENABLED_FOR.includes(state.username); }
 function applyFeatureFlags() {
